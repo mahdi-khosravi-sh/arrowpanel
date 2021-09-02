@@ -15,16 +15,8 @@ open class RippleAnimator : Animator() {
         setInterpolator(FastOutSlowInInterpolator())
     }
 
-    override fun initBeforeShow(arrowContainer: ArrowContainer) {
-        super.initBeforeShow(arrowContainer)
-        arrowContainer.alpha = 0.0F
-    }
-
     override fun animateShow(arrowContainer: ArrowContainer) {
-        arrowContainer.animate()
-            .alpha(1.0F)
-            .withStartAction { startRipple(true) }
-            .duration = getDuration()
+        startRipple(true)
     }
 
     override fun animateHide(arrowContainer: ArrowContainer) {
