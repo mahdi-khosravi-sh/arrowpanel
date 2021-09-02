@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ArrowContainer">
+        <attr name="arrowTip_arrowColor" format="color" />
+        <attr name="arrowTip_fillColor" format="color" />
+        <attr name="arrowTip_strokeColor" format="color" />
+        <attr name="arrowTip_shadowColor" format="color" />
+
+        <attr name="arrowTip_arrowWidth" format="dimension" />
+        <attr name="arrowTip_arrowHeight" format="dimension" />
+        <attr name="arrowTip_shadowDx" format="float" />
+        <attr name="arrowTip_shadowDy" format="float" />
+
+        <attr name="arrowTip_strokeWidth" format="dimension" />
+        <attr name="arrowTip_shadowRadius" format="dimension" />
+        <attr name="arrowTip_cornerRadius" format="dimension" />
+    </declare-styleable>
+</resources>
