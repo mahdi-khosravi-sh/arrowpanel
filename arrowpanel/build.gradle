@@ -6,7 +6,7 @@ plugins {
 
 def LIB_GROUP_ID = 'com.mahdikh.vision'
 def LIB_ARTIFACT_ID = 'arrowpanel'
-def LIB_VERSION = '1.0.2'
+def LIB_VERSION = '1.0.3'
 
 android {
     compileSdk 30
@@ -21,7 +21,6 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -46,7 +45,7 @@ publishing {
             groupId LIB_GROUP_ID
             artifactId LIB_ARTIFACT_ID
             version LIB_VERSION
-            artifact("$buildDir/outputs/aar/arrowpanel-debug.aar")
+            artifact("$buildDir/outputs/aar/arrowpanel-release.aar")
             artifact(sourceJar)
             pom.withXml {
                 def dependenciesNode = asNode().appendNode('dependencies')
