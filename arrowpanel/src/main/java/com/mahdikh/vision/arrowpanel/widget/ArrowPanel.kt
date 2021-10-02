@@ -464,14 +464,7 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context) {
         private val arrowPanel: ArrowPanel = ArrowPanel(context)
 
         open fun setDim(dimColor: Int, @DimDef dimAmount: Float = 0.6F): Builder {
-            arrowPanel.setBackgroundColor(
-                Color.argb(
-                    (dimAmount * 255).toInt(),
-                    Color.red(dimColor),
-                    Color.green(dimColor),
-                    Color.blue(dimColor),
-                )
-            )
+            arrowPanel.setDim(dimColor, dimAmount)
             return this
         }
 
