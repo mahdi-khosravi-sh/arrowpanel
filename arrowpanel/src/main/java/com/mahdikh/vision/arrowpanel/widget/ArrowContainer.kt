@@ -242,7 +242,7 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
     @SuppressLint("RtlHardcoded")
     private fun drawArrow(canvas: Canvas) {
         targetView?.let { target ->
-            target.getLocationInWindow(targetLocation)
+            target.getLocationOnScreen(targetLocation)
             if (y + measuredHeight <= targetLocation[1]) {
                 adjustPath(Gravity.BOTTOM)
             } else if (y >= targetLocation[1]) {
