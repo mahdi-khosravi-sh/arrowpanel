@@ -422,7 +422,8 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context) {
         @LongDef(DURATION_INFINITE, DURATION_SHORT, DURATION_MEDIUM, DURATION_LONG)
         annotation class DurationDef
 
-        fun getScreenSize(context: Context): Point {
+        @JvmStatic
+        private fun getScreenSize(context: Context): Point {
             val point = Point()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 context.display?.let {
@@ -444,7 +445,8 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context) {
             return point
         }
 
-        fun getWindowManager(context: Context): WindowManager {
+        @JvmStatic
+        private fun getWindowManager(context: Context): WindowManager {
             return context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         }
     }
