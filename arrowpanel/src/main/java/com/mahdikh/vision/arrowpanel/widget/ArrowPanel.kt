@@ -450,15 +450,18 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context) {
         }
     }
 
+    open fun setLocation(x: Int, y: Int) {
+        targetLocation[0] = x
+        targetLocation[1] = y
+    }
+
+    open fun setLocation(motionEvent: MotionEvent) {
+        targetLocation[0] = motionEvent.rawX.toInt()
+        targetLocation[1] = motionEvent.rawY.toInt()
+    }
+
     open class Builder(context: Context) {
         private val arrowPanel: ArrowPanel = ArrowPanel(context)
-
-        init {
-            arrowPanel.layoutParams = LayoutParams(
-                LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT
-            )
-        }
 
         open fun setDim(dimColor: Int, @DimDef dimAmount: Float = 0.6F): Builder {
             arrowPanel.setBackgroundColor(
@@ -607,8 +610,45 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context) {
             return this
         }
 
+        open fun setTargetView(targetView: View): Builder {
+            arrowPanel.targetView = targetView
+            return this
+        }
+
+        open fun setLocation(x: Int, y: Int): Builder {
+            arrowPanel.setLocation(x, y)
+            return this
+        }
+
+        open fun setLocation(motionEvent: MotionEvent): Builder {
+            arrowPanel.setLocation(motionEvent)
+            return this
+        }
+
         open fun build(): ArrowPanel {
+            arrowPanel.layoutParams = LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT
+            )
             return arrowPanel
+        }
+
+        open fun show(): ArrowPanel {
+            val p = build()
+            p.show()
+            return p
+        }
+
+        open fun show(targetView: View): ArrowPanel {
+            val p = build()
+            p.show(targetView)
+            return p
+        }
+
+        open fun show(motionEvent: MotionEvent): ArrowPanel {
+            val p = build()
+            p.show(motionEvent)
+            return p
         }
     }
 
