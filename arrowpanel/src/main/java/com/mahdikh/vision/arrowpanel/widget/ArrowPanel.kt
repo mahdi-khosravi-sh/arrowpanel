@@ -22,7 +22,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import com.mahdikh.vision.arrowpanel.animator.Animator
 
-
 open class ArrowPanel constructor(context: Context) : FrameLayout(context), ArrowInterface {
     private val targetLocation: IntArray = IntArray(2)
     private var blurView: BlurView? = null
@@ -171,7 +170,9 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
     }
 
     open fun onBackPressed() {
-        dismiss()
+        if (cancelable) {
+            cancel()
+        }
     }
 
     fun setContentView(layoutId: Int): View {
