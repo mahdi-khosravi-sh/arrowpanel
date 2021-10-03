@@ -23,6 +23,9 @@ import com.mahdikh.vision.arrowpanel.animator.Animator
 
 open class ArrowPanel constructor(context: Context) : FrameLayout(context), ArrowInterface {
     private val targetLocation: IntArray = IntArray(2)
+    private var blurView: BlurView? = null
+
+    var targetView: View? = null
     var drawTargetView: Boolean = true
     var cancelableOnTouchOutside: Boolean = true
     var cancelable: Boolean = true
@@ -30,6 +33,13 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
     var blurRadius: Float = 5.0F
     var arrowMargin: Int = 5
     var createAsWindow = false
+
+    private var mCanceled = false
+    private var mDismissed = false
+
+    var orientation = ORIENTATION_HORIZONTAL or ORIENTATION_VERTICAL
+    var arrowContainer: ArrowContainer
+        private set
 
     @DurationDef
     var timeOutDuration: Long = DURATION_INFINITE
@@ -39,12 +49,6 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
             }
             field = value
         }
-    var orientation = ORIENTATION_HORIZONTAL or ORIENTATION_VERTICAL
-
-    var targetView: View? = null
-    private var blurView: BlurView? = null
-    var arrowContainer: ArrowContainer
-        private set
 
     private var onShowListener: ArrowInterface.OnShowListener? = null
     private var onDismissListener: ArrowInterface.OnDismissListener? = null
@@ -57,10 +61,9 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         isFocusable = true
         isFocusableInTouchMode = true
         clipChildren = false
-        arrowContainer = ArrowContainer(context).also {
-            it.layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-        }
+        fitsSystemWindows = false
         layoutDirection = LAYOUT_DIRECTION_LTR
+        arrowContainer = ArrowContainer(context)
         super.setWillNotDraw(false)
     }
 
@@ -103,6 +106,10 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
 
     private fun addInRootViewGroup() {
         getRootViewGroup()?.let { rootView ->
+            layoutParams = LayoutParams(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT
+            )
             addView(arrowContainer)
             rootView.addView(this)
         } ?: kotlin.run {
@@ -112,14 +119,13 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
     }
 
     open fun show() {
-        fitsSystemWindows = false
         if (createAsWindow) {
             addAsWindow()
             post { showArrowLayout() }
         } else {
             addInRootViewGroup()
-            requestFocus()
             showArrowLayout()
+            requestFocus()
         }
     }
 
@@ -340,35 +346,36 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         }
     }
 
-    open fun removeFromRootViewByAnimate() {
+    open fun removeView() {
         animate()
             .alpha(0.0F)
             .setDuration(200)
             .withEndAction {
                 removeView(blurView)
                 blurView = null
-                getRootViewGroup()?.removeView(this)
+                if (createAsWindow) {
+                    getWindowManager(context).removeViewImmediate(this)
+                } else {
+                    getRootViewGroup()?.removeView(this)
+                }
             }
     }
 
-    private fun removeView() {
-        if (createAsWindow) {
-            val manager = getWindowManager(context)
-            manager.removeViewImmediate(this)
-        } else {
-            removeFromRootViewByAnimate()
+    override fun dismiss() {
+        if (!mDismissed) {
+            arrowContainer.hide()
+            removeView()
+            mDismissed = true
+            onDismissListener?.onDismiss(this)
         }
     }
 
-    override fun dismiss() {
-        arrowContainer.hide()
-        removeView()
-        onDismissListener?.onDismiss(this)
-    }
-
     override fun cancel() {
-        onCancelListener?.onCancel(this)
-        dismiss()
+        if (!mCanceled) {
+            mCanceled = true
+            onCancelListener?.onCancel(this)
+            dismiss()
+        }
     }
 
     protected open fun getRootViewGroup(): ViewGroup? {
@@ -593,37 +600,37 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         }
 
         open fun setStrokeWidth(strokeWidth: Float): Builder {
-            arrowPanel.arrowContainer.setStrokeWidth(strokeWidth)
+            arrowPanel.setStrokeWidth(strokeWidth)
             return this
         }
 
         open fun setStrokeColor(@ColorInt strokeColor: Int): Builder {
-            arrowPanel.arrowContainer.setStrokeColor(strokeColor)
+            arrowPanel.setStrokeColor(strokeColor)
             return this
         }
 
         open fun setFillColor(@ColorInt fillColor: Int): Builder {
-            arrowPanel.arrowContainer.setFillColor(fillColor)
+            arrowPanel.setFillColor(fillColor)
             return this
         }
 
         open fun setCornerRadius(cornerRadius: Float): Builder {
-            arrowPanel.arrowContainer.cornerRadius = cornerRadius
+            arrowPanel.setCornerRadius(cornerRadius)
             return this
         }
 
         open fun setArrowColor(@ColorInt arrowColor: Int): Builder {
-            arrowPanel.arrowContainer.setArrowColor(arrowColor)
+            arrowPanel.setArrowColor(arrowColor)
             return this
         }
 
         open fun setArrowWidth(arrowWidth: Int): Builder {
-            arrowPanel.arrowContainer.arrowWidth = arrowWidth
+            arrowPanel.setArrowWidth(arrowWidth)
             return this
         }
 
         open fun setArrowHeight(arrowHeight: Int): Builder {
-            arrowPanel.arrowContainer.arrowHeight = arrowHeight
+            arrowPanel.setArrowHeight(arrowHeight)
             return this
         }
 
@@ -724,10 +731,6 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         }
 
         open fun build(): ArrowPanel {
-            arrowPanel.layoutParams = LayoutParams(
-                LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT
-            )
             return arrowPanel
         }
 

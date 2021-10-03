@@ -62,6 +62,11 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
         arrowPaint.style = Paint.Style.FILL
         arrowPaint.color = Color.WHITE
 
+        layoutParams = LayoutParams(
+            LayoutParams.WRAP_CONTENT,
+            LayoutParams.WRAP_CONTENT
+        )
+
         adjustAttrsFromTheme(context)
     }
 
