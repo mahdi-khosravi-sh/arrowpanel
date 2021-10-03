@@ -213,7 +213,11 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         val arrowLayoutHeight = arrowContainer.measuredHeight
 
         targetView?.let { target ->
-            target.getLocationOnScreen(targetLocation)
+            if (createAsWindow) {
+                target.getLocationOnScreen(targetLocation)
+            } else {
+                target.getLocationInWindow(targetLocation)
+            }
 
             var y: Float
             var x: Float
@@ -394,7 +398,6 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         super.onDrawForeground(canvas)
         if (drawTargetView) {
             targetView?.let { targetView ->
-                targetView.getLocationOnScreen(targetLocation)
                 canvas.save()
                 canvas.translate(
                     targetLocation[0].toFloat(),
