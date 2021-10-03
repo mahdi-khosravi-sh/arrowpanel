@@ -10,6 +10,8 @@ import android.graphics.Point
 import android.os.Build
 import android.util.DisplayMetrics
 import android.view.*
+import android.view.View.OnClickListener
+import android.view.View.OnLongClickListener
 import android.view.WindowManager.LayoutParams
 import android.widget.FrameLayout
 import androidx.annotation.ColorInt
@@ -53,6 +55,8 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
     private var onShowListener: ArrowInterface.OnShowListener? = null
     private var onDismissListener: ArrowInterface.OnDismissListener? = null
     private var onCancelListener: ArrowInterface.OnCancelListener? = null
+    private var childClickListener: OnClickListener? = null
+    private var childLongClickListener: OnLongClickListener? = null
     private val dismissRunnable = Runnable { dismiss() }
 
     init {
@@ -544,20 +548,33 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         return arrowContainer.findViewById(id)
     }
 
-    open fun setOnChildClickListener(onClickListener: OnClickListener?, vararg ids: Int) {
+    open fun setOnChildClickListener(
+        onChildClickListener: ArrowInterface.OnChildClickListener?,
+        vararg ids: Int
+    ) {
+        childClickListener = if (onChildClickListener == null) {
+            null
+        } else {
+            OnClickListener { v -> onChildClickListener.onClick(v, this) }
+        }
         val size = ids.size
         for (i in 0 until size) {
-            arrowContainer.findViewById<View>(ids[i]).setOnClickListener(onClickListener)
+            arrowContainer.findViewById<View>(ids[i]).setOnClickListener(childClickListener)
         }
     }
 
     open fun setOnChildLongClickListener(
-        onLongClickListener: OnLongClickListener?,
+        onChildLongClickListener: ArrowInterface.OnChildLongClickListener?,
         vararg ids: Int
     ) {
+        childLongClickListener = if (onChildLongClickListener == null) {
+            null
+        } else {
+            OnLongClickListener { v -> onChildLongClickListener.onLongClick(v, this) }
+        }
         val size = ids.size
         for (i in 0 until size) {
-            arrowContainer.findViewById<View>(ids[i]).setOnLongClickListener(onLongClickListener)
+            arrowContainer.findViewById<View>(ids[i]).setOnLongClickListener(childLongClickListener)
         }
     }
 

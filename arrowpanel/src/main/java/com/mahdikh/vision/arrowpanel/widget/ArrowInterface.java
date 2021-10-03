@@ -1,5 +1,7 @@
 package com.mahdikh.vision.arrowpanel.widget;
 
+import android.view.View;
+
 public interface ArrowInterface {
     void dismiss();
 
@@ -15,5 +17,13 @@ public interface ArrowInterface {
 
     interface OnCancelListener {
         void onCancel(ArrowInterface arrowInterface);
+    }
+
+    interface OnChildClickListener {
+        void onClick(View view, ArrowInterface arrowInterface);
+    }
+
+    interface OnChildLongClickListener {
+        boolean onLongClick(View view, ArrowInterface arrowInterface);
     }
 }
