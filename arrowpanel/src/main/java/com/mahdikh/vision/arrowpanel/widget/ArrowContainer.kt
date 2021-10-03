@@ -23,6 +23,7 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
     private var arrowEdge: Int = Gravity.NO_GRAVITY
     private var firstYAxis: Float = 0.0F
     private var firstXAxis: Float = 0.0F
+    private var syncArrowLocation = true
     var drawArrow: Boolean = true
     var cornerRadius: Float = 15.0F
     var arrowWidth: Int = 20
@@ -216,6 +217,7 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
     }
 
     fun hide() {
+        syncArrowLocation = false
         animator?.animateHide(this)
     }
 
@@ -246,29 +248,31 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
 
     @SuppressLint("RtlHardcoded")
     private fun drawArrow(canvas: Canvas) {
-        targetView?.let { target ->
-            target.getLocationOnScreen(targetLocation)
-            if (y + measuredHeight <= targetLocation[1]) {
-                adjustPath(Gravity.BOTTOM)
-            } else if (y >= targetLocation[1]) {
-                adjustPath(Gravity.TOP)
-            } else {
-                if ((x > targetLocation[0] && x < targetLocation[0] + target.width) or (x > targetLocation[0] + target.width / 2)) {
-                    adjustPath(Gravity.LEFT)
+        if (syncArrowLocation) {
+            targetView?.let { target ->
+                target.getLocationOnScreen(targetLocation)
+                if (y + measuredHeight <= targetLocation[1]) {
+                    adjustPath(Gravity.BOTTOM)
+                } else if (y >= targetLocation[1]) {
+                    adjustPath(Gravity.TOP)
                 } else {
-                    adjustPath(Gravity.RIGHT)
+                    if ((x > targetLocation[0] && x < targetLocation[0] + target.width) or (x > targetLocation[0] + target.width / 2)) {
+                        adjustPath(Gravity.LEFT)
+                    } else {
+                        adjustPath(Gravity.RIGHT)
+                    }
                 }
-            }
-        } ?: kotlin.run {
-            if (firstYAxis + measuredHeight <= targetLocation[1]) {
-                adjustPath(Gravity.BOTTOM)
-            } else if (firstYAxis >= targetLocation[1]) {
-                adjustPath(Gravity.TOP)
-            } else {
-                if (firstXAxis < targetLocation[0]) {
-                    adjustPath(Gravity.RIGHT)
+            } ?: kotlin.run {
+                if (firstYAxis + measuredHeight <= targetLocation[1]) {
+                    adjustPath(Gravity.BOTTOM)
+                } else if (firstYAxis >= targetLocation[1]) {
+                    adjustPath(Gravity.TOP)
                 } else {
-                    adjustPath(Gravity.LEFT)
+                    if (firstXAxis < targetLocation[0]) {
+                        adjustPath(Gravity.RIGHT)
+                    } else {
+                        adjustPath(Gravity.LEFT)
+                    }
                 }
             }
         }
