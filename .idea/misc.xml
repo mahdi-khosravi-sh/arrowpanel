@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/layout/panel.xml" value="0.18795289855072464" />
         <entry key="arrowpanel/src/main/res/layout/arrowtip_simple_text.xml" value="0.1" />
       </map>
     </option>
