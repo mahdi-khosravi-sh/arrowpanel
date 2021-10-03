@@ -65,8 +65,8 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         isFocusableInTouchMode = true
         clipChildren = false
         fitsSystemWindows = false
-        layoutDirection = LAYOUT_DIRECTION_LTR
         arrowContainer = ArrowContainer(context)
+        super.setLayoutDirection(LAYOUT_DIRECTION_LTR)
         super.setWillNotDraw(false)
     }
 
@@ -417,6 +417,10 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
             cancel()
         }
         return super.onTouchEvent(event)
+    }
+
+    override fun setLayoutDirection(layoutDirection: Int) {
+        arrowContainer.layoutDirection = layoutDirection
     }
 
     fun setOnShowListener(onShowListener: ArrowInterface.OnShowListener?) {
