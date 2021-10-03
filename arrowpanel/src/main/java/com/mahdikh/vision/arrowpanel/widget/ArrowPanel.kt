@@ -21,7 +21,7 @@ import androidx.fragment.app.FragmentActivity
 import com.mahdikh.vision.arrowpanel.animator.Animator
 
 
-open class ArrowPanel constructor(context: Context) : FrameLayout(context) {
+open class ArrowPanel constructor(context: Context) : FrameLayout(context), ArrowInterface {
     private val targetLocation: IntArray = IntArray(2)
     var drawTargetView: Boolean = true
     var cancelableOnTouchOutside: Boolean = true
@@ -43,11 +43,12 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context) {
 
     var targetView: View? = null
     private var blurView: BlurView? = null
-    private var arrowContainer: ArrowContainer
+    var arrowContainer: ArrowContainer
+        private set
 
-    private var onShowListener: OnShowListener? = null
-    private var onDismissListener: OnDismissListener? = null
-    private var onCancelListener: OnCancelListener? = null
+    private var onShowListener: ArrowInterface.OnShowListener? = null
+    private var onDismissListener: ArrowInterface.OnDismissListener? = null
+    private var onCancelListener: ArrowInterface.OnCancelListener? = null
     private val dismissRunnable = Runnable { dismiss() }
 
     init {
@@ -67,7 +68,15 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context) {
         blurView = BlurView(context).also {
             it.addNoBlurView(this)
             it.setOverlapView(this)
-            it.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+            it.layoutParams = LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT
+            )
+            if (drawTargetView) {
+                targetView?.let { target ->
+                    it.addNoBlurView(target)
+                }
+            }
         }
         addView(blurView, 0)
     }
@@ -124,7 +133,14 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context) {
         animate().alpha(1.0F).duration = 150
         arrowContainer.show()
         onShowListener?.onShow(this)
-        blurView?.blur(rootView, blurQuality, blurRadius, false)
+
+        blurView?.let {
+            val sourceView = getRootViewGroup()
+            if (sourceView != null) {
+                it.blur(sourceView, blurQuality, blurRadius, false)
+            }
+        }
+
         if (timeOutDuration != DURATION_INFINITE) {
             postDelayed(dismissRunnable, timeOutDuration)
         }
@@ -344,16 +360,15 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context) {
         }
     }
 
-    open fun dismiss() {
+    override fun dismiss() {
         arrowContainer.hide()
         removeView()
         onDismissListener?.onDismiss(this)
     }
 
-    open fun cancel() {
-        arrowContainer.hide()
-        removeView()
+    override fun cancel() {
         onCancelListener?.onCancel(this)
+        dismiss()
     }
 
     protected open fun getRootViewGroup(): ViewGroup? {
@@ -392,15 +407,15 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context) {
         return super.onTouchEvent(event)
     }
 
-    fun setOnShowListener(onShowListener: OnShowListener?) {
+    fun setOnShowListener(onShowListener: ArrowInterface.OnShowListener?) {
         this.onShowListener = onShowListener
     }
 
-    fun setOnDismissListener(onDismissListener: OnDismissListener?) {
+    fun setOnDismissListener(onDismissListener: ArrowInterface.OnDismissListener?) {
         this.onDismissListener = onDismissListener
     }
 
-    fun setOnCancelListener(onCancelListener: OnCancelListener?) {
+    fun setOnCancelListener(onCancelListener: ArrowInterface.OnCancelListener?) {
         this.onCancelListener = onCancelListener
     }
 
@@ -563,11 +578,7 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context) {
         }
 
         open fun setDrawBlurEffect(drawBlurEffect: Boolean): Builder {
-            if (drawBlurEffect) {
-                arrowPanel.createBlurView()
-            } else {
-                arrowPanel.blurView = null
-            }
+            arrowPanel.setDrawBlurEffect(drawBlurEffect)
             return this
         }
 
@@ -647,17 +658,17 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context) {
             return this
         }
 
-        fun setOnShowListener(onShowListener: OnShowListener?): Builder {
+        fun setOnShowListener(onShowListener: ArrowInterface.OnShowListener?): Builder {
             arrowPanel.setOnShowListener(onShowListener)
             return this
         }
 
-        fun setOnDismissListener(onDismissListener: OnDismissListener?): Builder {
+        fun setOnDismissListener(onDismissListener: ArrowInterface.OnDismissListener?): Builder {
             arrowPanel.setOnDismissListener(onDismissListener)
             return this
         }
 
-        fun setOnCancelListener(onCancelListener: OnCancelListener?): Builder {
+        fun setOnCancelListener(onCancelListener: ArrowInterface.OnCancelListener?): Builder {
             arrowPanel.setOnCancelListener(onCancelListener)
             return this
         }
@@ -743,16 +754,4 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context) {
     @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
     @FloatRange(from = 0.0, to = 1.0)
     annotation class DimDef
-
-    interface OnShowListener {
-        fun onShow(arrowPanel: ArrowPanel)
-    }
-
-    interface OnDismissListener {
-        fun onDismiss(arrowPanel: ArrowPanel)
-    }
-
-    interface OnCancelListener {
-        fun onCancel(arrowPanel: ArrowPanel)
-    }
 }
