@@ -79,7 +79,7 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
     private fun adjustAttrsFromTheme(context: Context) {
         val a: TypedArray = context.obtainStyledAttributes(R.styleable.ArrowContainer)
         var shadowColor = Color.parseColor("#33000000")
-        var shadowRadius = 5.0F
+        var shadowRadius = 15.0F
         var shadowDx = 0.0F
         var shadowDy = 0.0F
 
@@ -121,7 +121,6 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
                 }
             }
         }
-
         if (shadowRadius > 0) {
             setShadow(shadowRadius, shadowDx, shadowDy, shadowColor)
         }
@@ -159,13 +158,7 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
     }
 
     fun setShadow(radius: Float, dx: Float, dy: Float, shadowColor: Int) {
-        if (strokePaint.strokeWidth > 0) {
-            strokePaint.setShadowLayer(radius, dx, dy, shadowColor)
-            paint.setShadowLayer(0F, 0F, 0F, Color.TRANSPARENT)
-        } else {
-            paint.setShadowLayer(radius, dx, dy, shadowColor)
-            strokePaint.setShadowLayer(0F, 0F, 0F, Color.TRANSPARENT)
-        }
+        paint.setShadowLayer(radius, dx, dy, shadowColor)
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
@@ -195,11 +188,11 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         adjustPath()
-        if (strokePaint.strokeWidth > 0.0F) {
-            canvas.drawPath(path, strokePaint)
-        } else {
-            canvas.drawPath(path, paint)
-        }
+        canvas.drawPath(path, paint)
+
+//        if (strokePaint.strokeWidth > 0.0F) {
+        canvas.drawPath(path, strokePaint)
+//        }
     }
 
     private fun adjustPath() {
@@ -246,6 +239,7 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
             }
             path.addPath(arrowPath)
         }
+        path.op(path, Path.Op.UNION)
     }
 
     @SuppressLint("RtlHardcoded")
@@ -257,6 +251,7 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
 
         var targetWidth = 0
         var targetHeight = 0
+        val halfStroke = strokePaint.strokeWidth / 2F
 
         targetView?.let {
             targetWidth = it.width
@@ -287,7 +282,7 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
 
                     leftPointX = arrowHeight.toFloat()
 
-                    edgePointX = arrowHeight.toFloat()
+                    edgePointX = arrowHeight.toFloat() + halfStroke
                     edgePointY = measuredHeight - arrowHeight - cornerRadius
                     rightPointX -= cornerRadius
                     centerPointX -= cornerRadius
@@ -303,7 +298,7 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
                     leftPointX = rightPointX - arrowWidth
                     //Rights
 
-                    edgePointX = measuredWidth - arrowHeight.toFloat()
+                    edgePointX = measuredWidth - arrowHeight.toFloat() - halfStroke
                     edgePointY = measuredHeight - arrowHeight - cornerRadius
                     rightPointX += cornerRadius
                     leftPointX += cornerRadius
@@ -321,7 +316,7 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
 
             when (edge) {
                 Gravity.TOP -> {
-                    pointY = arrowHeight.toFloat()
+                    pointY = arrowHeight.toFloat() + halfStroke
                     centerPointY = 0.0F
 
                     arrowPath.moveTo(rightPointX, pointY)
@@ -333,7 +328,7 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
                     }
                 }
                 else -> {
-                    pointY = (measuredHeight - arrowHeight).toFloat()
+                    pointY = (measuredHeight - arrowHeight).toFloat() - halfStroke
                     centerPointY = measuredHeight.toFloat()
 
                     if (edgePointX != -1.0F && edgePointY != -1.0F) {
@@ -375,10 +370,10 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
             val pointX: Float
 
             if (edge == Gravity.LEFT) {
-                pointX = arrowHeight.toFloat()
+                pointX = arrowHeight + halfStroke
                 centerPointX = 0.0F
             } else {
-                pointX = measuredWidth - arrowHeight.toFloat()
+                pointX = measuredWidth - arrowHeight - halfStroke
                 centerPointX = measuredWidth.toFloat()
             }
 

@@ -38,7 +38,7 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
     private var mCanceled = false
     private var mDismissed = false
 
-    var orientation = ORIENTATION_HORIZONTAL or ORIENTATION_VERTICAL
+    var orientation = ORIENTATION_HORIZONTAL
     var arrowContainer: ArrowContainer
         private set
 
