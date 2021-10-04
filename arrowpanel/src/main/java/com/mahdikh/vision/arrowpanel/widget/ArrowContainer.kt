@@ -90,68 +90,40 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
             index = a.getIndex(i)
             when (index) {
                 R.styleable.ArrowContainer_arrowTip_fillColor -> {
-                    val fillColor = a.getColor(
-                        R.styleable.ArrowContainer_arrowTip_fillColor, Color.WHITE
-                    )
-                    setFillColor(fillColor)
+                    setFillColor(a.getColor(index, Color.WHITE))
                 }
                 R.styleable.ArrowContainer_arrowTip_strokeColor -> {
-                    val strokeColor = a.getColor(
-                        R.styleable.ArrowContainer_arrowTip_strokeColor, Color.WHITE
-                    )
-                    setStrokeColor(strokeColor)
+                    setStrokeColor(a.getColor(index, Color.WHITE))
                 }
                 R.styleable.ArrowContainer_arrowTip_strokeWidth -> {
-                    val strokeWidth = a.getDimension(
-                        R.styleable.ArrowContainer_arrowTip_strokeWidth, 0.0F
-                    )
-                    setStrokeWidth(strokeWidth)
+                    setStrokeWidth(a.getDimension(index, 0.0F))
                 }
                 R.styleable.ArrowContainer_arrowTip_arrowWidth -> {
-                    arrowWidth = a.getDimensionPixelSize(
-                        R.styleable.ArrowContainer_arrowTip_arrowWidth, 20
-                    )
+                    arrowWidth = a.getDimensionPixelSize(index, 20)
                 }
                 R.styleable.ArrowContainer_arrowTip_arrowHeight -> {
-                    arrowHeight = a.getDimensionPixelSize(
-                        R.styleable.ArrowContainer_arrowTip_arrowHeight, 15
-                    )
+                    arrowHeight = a.getDimensionPixelSize(index, 15)
                 }
                 R.styleable.ArrowContainer_arrowTip_shadowRadius -> {
-                    shadowRadius = a.getDimension(
-                        R.styleable.ArrowContainer_arrowTip_shadowRadius, 10.0F
-                    )
+                    shadowRadius = a.getDimension(index, 10.0F)
                 }
                 R.styleable.ArrowContainer_arrowTip_shadowDy -> {
-                    shadowDy = a.getFloat(
-                        R.styleable.ArrowContainer_arrowTip_shadowDy, 0.0F
-                    )
+                    shadowDy = a.getFloat(index, 0.0F)
                 }
                 R.styleable.ArrowContainer_arrowTip_shadowDx -> {
-                    shadowDx = a.getFloat(
-                        R.styleable.ArrowContainer_arrowTip_shadowDx, 0.0f
-                    )
+                    shadowDx = a.getFloat(index, 0.0f)
                 }
                 R.styleable.ArrowContainer_arrowTip_shadowColor -> {
-                    shadowColor = a.getColor(
-                        R.styleable.ArrowContainer_arrowTip_shadowColor, shadowColor
-                    )
+                    shadowColor = a.getColor(index, shadowColor)
                 }
                 R.styleable.ArrowContainer_arrowTip_cornerRadius -> {
-                    cornerRadius = a.getDimension(
-                        R.styleable.ArrowContainer_arrowTip_cornerRadius, 15.0F
-                    )
+                    cornerRadius = a.getDimension(index, 15.0F)
                 }
             }
         }
 
         if (shadowRadius > 0) {
-            setShadow(
-                shadowRadius,
-                shadowDx,
-                shadowDy,
-                shadowColor
-            )
+            setShadow(shadowRadius, shadowDx, shadowDy, shadowColor)
         }
         a.recycle()
     }
