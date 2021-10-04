@@ -5,14 +5,11 @@ import com.mahdikh.vision.arrowpanel.widget.ArrowContainer
 open class ScaleAnimator : Animator() {
     var fromScale: Float = 0.8F
 
-    override fun initBeforeShow(arrowContainer: ArrowContainer) {
-        super.initBeforeShow(arrowContainer)
+    override fun animateShow(arrowContainer: ArrowContainer) {
         arrowContainer.alpha = 0.0F
         arrowContainer.scaleX = fromScale
         arrowContainer.scaleY = fromScale
-    }
 
-    override fun animateShow(arrowContainer: ArrowContainer) {
         arrowContainer.animate()
             .alpha(1.0F)
             .scaleX(1.0F)
