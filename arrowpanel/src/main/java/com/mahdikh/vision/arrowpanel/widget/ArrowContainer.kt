@@ -79,7 +79,7 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
     private fun adjustAttrsFromTheme(context: Context) {
         val a: TypedArray = context.obtainStyledAttributes(R.styleable.ArrowContainer)
         var shadowColor = Color.parseColor("#33000000")
-        var shadowRadius = 15.0F
+        var shadowRadius = 5.0F
         var shadowDx = 0.0F
         var shadowDy = 0.0F
 
@@ -190,9 +190,9 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
         adjustPath()
         canvas.drawPath(path, paint)
 
-//        if (strokePaint.strokeWidth > 0.0F) {
-        canvas.drawPath(path, strokePaint)
-//        }
+        if (strokePaint.strokeWidth > 0.0F) {
+            canvas.drawPath(path, strokePaint)
+        }
     }
 
     private fun adjustPath() {
@@ -201,10 +201,10 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
         path.fillType = Path.FillType.WINDING
         val halfStrokeWidth = strokePaint.strokeWidth / 2F
         path.addRoundRect(
-            paddingLeft.toFloat() + halfStrokeWidth,
-            paddingTop.toFloat() + halfStrokeWidth,
-            width.toFloat() - paddingRight - halfStrokeWidth,
-            height.toFloat() - paddingBottom - halfStrokeWidth,
+            paddingLeft + halfStrokeWidth,
+            paddingTop + halfStrokeWidth,
+            width - paddingRight - halfStrokeWidth,
+            height - paddingBottom - halfStrokeWidth,
             cornerRadius, cornerRadius, Path.Direction.CCW
         )
 
