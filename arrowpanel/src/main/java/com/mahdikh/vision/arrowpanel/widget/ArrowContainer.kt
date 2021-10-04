@@ -73,13 +73,11 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
             LayoutParams.WRAP_CONTENT,
             LayoutParams.WRAP_CONTENT
         )
-        setShadow(5F, 0F, 0F, Color.BLACK)
         adjustAttrsFromTheme(context)
     }
 
     private fun adjustAttrsFromTheme(context: Context) {
         val a: TypedArray = context.obtainStyledAttributes(R.styleable.ArrowContainer)
-
         var shadowColor = Color.parseColor("#33000000")
         var shadowRadius = 5.0F
         var shadowDx = 0.0F
@@ -234,6 +232,17 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
 
     private fun adjustPath() {
         path.reset()
+
+        path.fillType = Path.FillType.WINDING
+        val halfStrokeWidth = strokePaint.strokeWidth / 2F
+        path.addRoundRect(
+            paddingLeft.toFloat() + halfStrokeWidth,
+            paddingTop.toFloat() + halfStrokeWidth,
+            width.toFloat() - paddingRight - halfStrokeWidth,
+            height.toFloat() - paddingBottom - halfStrokeWidth,
+            cornerRadius, cornerRadius, Path.Direction.CCW
+        )
+
         if (drawArrow) {
             if (syncArrowLocation) {
                 targetView?.let { target ->
@@ -265,15 +274,6 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
             }
             path.addPath(arrowPath)
         }
-
-        val halfStrokeWidth = strokePaint.strokeWidth / 2F
-        path.addRoundRect(
-            paddingLeft.toFloat() + halfStrokeWidth,
-            paddingTop.toFloat() + halfStrokeWidth,
-            width.toFloat() - paddingRight - halfStrokeWidth,
-            height.toFloat() - paddingBottom - halfStrokeWidth,
-            cornerRadius, cornerRadius, Path.Direction.CCW
-        )
     }
 
     @SuppressLint("RtlHardcoded")
@@ -351,19 +351,28 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
                 Gravity.TOP -> {
                     pointY = arrowHeight.toFloat()
                     centerPointY = 0.0F
+
+                    arrowPath.moveTo(rightPointX, pointY)
+                    arrowPath.lineTo(centerPointX, centerPointY)
+                    arrowPath.lineTo(leftPointX, pointY)
+
+                    if (edgePointX != -1.0F && edgePointY != -1.0F) {
+                        arrowPath.lineTo(edgePointX, edgePointY)
+                    }
                 }
                 else -> {
                     pointY = (measuredHeight - arrowHeight).toFloat()
                     centerPointY = measuredHeight.toFloat()
+
+                    if (edgePointX != -1.0F && edgePointY != -1.0F) {
+                        arrowPath.moveTo(edgePointX, height - edgePointY)
+                        arrowPath.lineTo(leftPointX, pointY)
+                    } else {
+                        arrowPath.moveTo(leftPointX, pointY)
+                    }
+                    arrowPath.lineTo(centerPointX, centerPointY)
+                    arrowPath.lineTo(rightPointX, pointY)
                 }
-            }
-
-            arrowPath.moveTo(rightPointX, pointY)
-            arrowPath.lineTo(centerPointX, centerPointY)
-            arrowPath.lineTo(leftPointX, pointY)
-
-            if (edgePointX != -1.0F && edgePointY != -1.0F) {
-                arrowPath.lineTo(edgePointX, edgePointY)
             }
 
             pivotX = rightPointX - arrowWidth / 2
@@ -408,6 +417,7 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
             pivotX = pointX
             pivotY = centerPointY
         }
+        arrowPath.close()
     }
 
     @kotlin.annotation.Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
