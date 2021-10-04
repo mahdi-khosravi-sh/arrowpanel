@@ -3,35 +3,44 @@ package com.mahdikh.vision.arrowpanel.widget
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.TypedArray
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import androidx.annotation.ColorInt
 import androidx.annotation.IntDef
+import androidx.core.view.setPadding
 import com.mahdikh.vision.arrowpanel.R
 import com.mahdikh.vision.arrowpanel.animator.Animator
 
 class ArrowContainer(context: Context) : FrameLayout(context) {
     private val strokePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val paint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val rectF: RectF = RectF()
+
+    private val path: Path = Path()
     private val arrowPath: Path = Path()
-    private val arrowPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
+
     private val targetLocation: IntArray = IntArray(2)
     private var arrowEdge: Int = Gravity.NO_GRAVITY
+
     private var firstYAxis: Float = 0.0F
     private var firstXAxis: Float = 0.0F
+
     private var syncArrowLocation = true
     var drawArrow: Boolean = true
     var cornerRadius: Float = 15.0F
+
     var arrowWidth: Int = 20
     var arrowHeight: Int = 15
         set(value) {
             field = value
-            setPadding(value, value, value, value)
+            setPadding(value)
         }
+
     var targetView: View? = null
         set(value) {
             field = value
@@ -47,6 +56,8 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
         }
 
     init {
+        setPadding(arrowHeight)
+
         isClickable = true
         isFocusable = true
         setWillNotDraw(false)
@@ -58,16 +69,11 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
         strokePaint.strokeJoin = Paint.Join.ROUND
         strokePaint.color = Color.WHITE
 
-        arrowPaint.strokeJoin = Paint.Join.ROUND
-        arrowPaint.strokeCap = Paint.Cap.ROUND
-        arrowPaint.style = Paint.Style.FILL
-        arrowPaint.color = Color.WHITE
-
         layoutParams = LayoutParams(
             LayoutParams.WRAP_CONTENT,
             LayoutParams.WRAP_CONTENT
         )
-
+        setShadow(5F, 0F, 0F, Color.BLACK)
         adjustAttrsFromTheme(context)
     }
 
@@ -97,12 +103,6 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
                     )
                     setStrokeColor(strokeColor)
                 }
-                R.styleable.ArrowContainer_arrowTip_arrowColor -> {
-                    val arrowColor = a.getColor(
-                        R.styleable.ArrowContainer_arrowTip_arrowColor, Color.WHITE
-                    )
-                    setArrowColor(arrowColor)
-                }
                 R.styleable.ArrowContainer_arrowTip_strokeWidth -> {
                     val strokeWidth = a.getDimension(
                         R.styleable.ArrowContainer_arrowTip_strokeWidth, 0.0F
@@ -118,7 +118,6 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
                     arrowHeight = a.getDimensionPixelSize(
                         R.styleable.ArrowContainer_arrowTip_arrowHeight, 15
                     )
-                    setPadding(arrowHeight, arrowHeight, arrowHeight, arrowHeight)
                 }
                 R.styleable.ArrowContainer_arrowTip_shadowRadius -> {
                     shadowRadius = a.getDimension(
@@ -147,6 +146,7 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
                 }
             }
         }
+
         if (shadowRadius > 0) {
             setShadow(
                 shadowRadius,
@@ -168,10 +168,6 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
 
     fun setStrokeColor(@ColorInt color: Int) {
         strokePaint.color = color
-    }
-
-    fun setArrowColor(@ColorInt color: Int) {
-        arrowPaint.color = color
     }
 
     fun setStrokeWidth(strokeWidth: Float) {
@@ -228,57 +224,56 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        drawBackground(canvas)
-        drawArrow(canvas)
-    }
-
-    private fun drawBackground(canvas: Canvas) {
-        val halfStrokeWidth = strokePaint.strokeWidth / 2F
-        rectF.set(
-            paddingLeft.toFloat() + halfStrokeWidth,
-            paddingTop.toFloat() + halfStrokeWidth,
-            width.toFloat() - paddingRight - halfStrokeWidth,
-            height.toFloat() - paddingBottom - halfStrokeWidth
-        )
+        adjustPath()
         if (strokePaint.strokeWidth > 0.0F) {
-            canvas.drawRoundRect(rectF, cornerRadius, cornerRadius, strokePaint)
+            canvas.drawPath(path, strokePaint)
+        } else {
+            canvas.drawPath(path, paint)
         }
-        canvas.drawRoundRect(rectF, cornerRadius, cornerRadius, paint)
     }
 
-    @SuppressLint("RtlHardcoded")
-    private fun drawArrow(canvas: Canvas) {
-        if (syncArrowLocation) {
-            targetView?.let { target ->
-                target.getLocationOnScreen(targetLocation)
-                if (y + measuredHeight <= targetLocation[1]) {
-                    adjustPath(Gravity.BOTTOM)
-                } else if (y >= targetLocation[1]) {
-                    adjustPath(Gravity.TOP)
-                } else {
-                    if ((x > targetLocation[0] && x < targetLocation[0] + target.width) or (x > targetLocation[0] + target.width / 2)) {
-                        adjustPath(Gravity.LEFT)
+    private fun adjustPath() {
+        path.reset()
+        if (drawArrow) {
+            if (syncArrowLocation) {
+                targetView?.let { target ->
+                    target.getLocationOnScreen(targetLocation)
+                    if (y + measuredHeight <= targetLocation[1]) {
+                        adjustPath(Gravity.BOTTOM)
+                    } else if (y >= targetLocation[1]) {
+                        adjustPath(Gravity.TOP)
                     } else {
-                        adjustPath(Gravity.RIGHT)
+                        if ((x > targetLocation[0] && x < targetLocation[0] + target.width) or (x > targetLocation[0] + target.width / 2)) {
+                            adjustPath(Gravity.LEFT)
+                        } else {
+                            adjustPath(Gravity.RIGHT)
+                        }
                     }
-                }
-            } ?: kotlin.run {
-                if (firstYAxis + measuredHeight <= targetLocation[1]) {
-                    adjustPath(Gravity.BOTTOM)
-                } else if (firstYAxis >= targetLocation[1]) {
-                    adjustPath(Gravity.TOP)
-                } else {
-                    if (firstXAxis < targetLocation[0]) {
-                        adjustPath(Gravity.RIGHT)
+                } ?: kotlin.run {
+                    if (firstYAxis + measuredHeight <= targetLocation[1]) {
+                        adjustPath(Gravity.BOTTOM)
+                    } else if (firstYAxis >= targetLocation[1]) {
+                        adjustPath(Gravity.TOP)
                     } else {
-                        adjustPath(Gravity.LEFT)
+                        if (firstXAxis < targetLocation[0]) {
+                            adjustPath(Gravity.RIGHT)
+                        } else {
+                            adjustPath(Gravity.LEFT)
+                        }
                     }
                 }
             }
+            path.addPath(arrowPath)
         }
-        if (drawArrow) {
-            canvas.drawPath(arrowPath, arrowPaint)
-        }
+
+        val halfStrokeWidth = strokePaint.strokeWidth / 2F
+        path.addRoundRect(
+            paddingLeft.toFloat() + halfStrokeWidth,
+            paddingTop.toFloat() + halfStrokeWidth,
+            width.toFloat() - paddingRight - halfStrokeWidth,
+            height.toFloat() - paddingBottom - halfStrokeWidth,
+            cornerRadius, cornerRadius, Path.Direction.CCW
+        )
     }
 
     @SuppressLint("RtlHardcoded")

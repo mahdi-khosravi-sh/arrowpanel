@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="ArrowContainer">
-        <attr name="arrowTip_arrowColor" format="color" />
         <attr name="arrowTip_fillColor" format="color" />
         <attr name="arrowTip_strokeColor" format="color" />
         <attr name="arrowTip_shadowColor" format="color" />

@@ -501,10 +501,6 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         arrowContainer.cornerRadius = cornerRadius
     }
 
-    open fun setArrowColor(@ColorInt arrowColor: Int) {
-        arrowContainer.setArrowColor(arrowColor)
-    }
-
     open fun setArrowWidth(arrowWidth: Int) {
         arrowContainer.arrowWidth = arrowWidth
     }
@@ -641,11 +637,6 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
 
         open fun setCornerRadius(cornerRadius: Float): Builder {
             arrowPanel.setCornerRadius(cornerRadius)
-            return this
-        }
-
-        open fun setArrowColor(@ColorInt arrowColor: Int): Builder {
-            arrowPanel.setArrowColor(arrowColor)
             return this
         }
 
