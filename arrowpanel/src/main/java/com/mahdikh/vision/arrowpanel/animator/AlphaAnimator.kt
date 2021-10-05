@@ -1,22 +1,22 @@
 package com.mahdikh.vision.arrowpanel.animator
 
-import com.mahdikh.vision.arrowpanel.widget.ArrowContainer
+import android.view.View
 
 open class AlphaAnimator : Animator() {
-    override fun initBeforeShow(arrowContainer: ArrowContainer) {
-        super.initBeforeShow(arrowContainer)
-        arrowContainer.alpha = 0.0F
+    override fun initBeforeShow(view: View) {
+        super.initBeforeShow(view)
+        view.alpha = 0.0F
     }
 
-    override fun animateShow(arrowContainer: ArrowContainer) {
-        arrowContainer.animate()
+    override fun animateShow(view: View) {
+        view.animate()
             .alpha(1.0F)
             .setDuration(getDuration())
             .interpolator = getInterpolator()
     }
 
-    override fun animateHide(arrowContainer: ArrowContainer) {
-        arrowContainer.animate()
+    override fun animateHide(view: View) {
+        view.animate()
             .alpha(0.0F)
             .setDuration(getDuration())
             .interpolator = getInterpolator()

@@ -4,7 +4,6 @@ import android.view.Gravity
 import android.view.View
 import android.view.animation.OvershootInterpolator
 import androidx.annotation.IntDef
-import com.mahdikh.vision.arrowpanel.widget.ArrowContainer
 
 open class SlideAnimator : Animator {
     @SlideEdgeDef
@@ -25,16 +24,16 @@ open class SlideAnimator : Animator {
         this.slideEdge = slideEdge
     }
 
-    override fun initBeforeShow(arrowContainer: ArrowContainer) {
-        super.initBeforeShow(arrowContainer)
-        arrowContainer.alpha = 0.0F
+    override fun initBeforeShow(view: View) {
+        super.initBeforeShow(view)
+        view.alpha = 0.0F
     }
 
-    private fun checkLayoutDirection(arrowContainer: ArrowContainer) {
+    private fun checkLayoutDirection(view: View) {
         when (slideEdge) {
             Gravity.START -> {
                 slideEdge =
-                    if (arrowContainer.rootView.layoutDirection == View.LAYOUT_DIRECTION_LTR) {
+                    if (view.rootView.layoutDirection == View.LAYOUT_DIRECTION_LTR) {
                         Gravity.LEFT
                     } else {
                         Gravity.RIGHT
@@ -42,7 +41,7 @@ open class SlideAnimator : Animator {
             }
             Gravity.END -> {
                 slideEdge =
-                    if (arrowContainer.rootView.layoutDirection == View.LAYOUT_DIRECTION_LTR) {
+                    if (view.rootView.layoutDirection == View.LAYOUT_DIRECTION_LTR) {
                         Gravity.RIGHT
                     } else {
                         Gravity.LEFT
@@ -51,43 +50,43 @@ open class SlideAnimator : Animator {
         }
     }
 
-    override fun animateShow(arrowContainer: ArrowContainer) {
-        val x = arrowContainer.x
-        val y = arrowContainer.y
+    override fun animateShow(view: View) {
+        val x = view.x
+        val y = view.y
 
-        checkLayoutDirection(arrowContainer)
+        checkLayoutDirection(view)
 
         when (slideEdge) {
             Gravity.TOP -> {
-                arrowContainer.translationY = y - slideTranslation
+                view.translationY = y - slideTranslation
             }
             Gravity.BOTTOM -> {
-                arrowContainer.translationY = y + slideTranslation
+                view.translationY = y + slideTranslation
             }
             Gravity.RIGHT -> {
-                arrowContainer.translationX = x + slideTranslation
+                view.translationX = x + slideTranslation
             }
             Gravity.LEFT -> {
-                arrowContainer.translationX = x - slideTranslation
+                view.translationX = x - slideTranslation
             }
         }
 
-        arrowContainer.animate()
+        view.animate()
             .alpha(1.0F)
             .translationX(x)
             .translationY(y)
             .setUpdateListener {
-                arrowContainer.invalidate()
+                view.invalidate()
             }
             .setDuration(getDuration())
             .interpolator = getInterpolator()
     }
 
-    override fun animateHide(arrowContainer: ArrowContainer) {
-        var x = arrowContainer.x
-        var y = arrowContainer.y
+    override fun animateHide(view: View) {
+        var x = view.x
+        var y = view.y
 
-        checkLayoutDirection(arrowContainer)
+        checkLayoutDirection(view)
 
         if (hideReverse) {
             when (slideEdge) {
@@ -121,11 +120,11 @@ open class SlideAnimator : Animator {
             }
         }
 
-        arrowContainer.animate()
+        view.animate()
             .alpha(0.0F)
             .translationX(x)
             .translationY(y)
-            .setUpdateListener { arrowContainer.invalidate() }
+            .setUpdateListener { view.invalidate() }
             .setDuration(getDuration())
             .interpolator = getInterpolator()
     }

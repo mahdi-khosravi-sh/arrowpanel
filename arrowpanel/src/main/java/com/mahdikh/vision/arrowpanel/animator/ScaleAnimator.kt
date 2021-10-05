@@ -1,16 +1,16 @@
 package com.mahdikh.vision.arrowpanel.animator
 
-import com.mahdikh.vision.arrowpanel.widget.ArrowContainer
+import android.view.View
 
 open class ScaleAnimator : Animator() {
     var fromScale: Float = 0.8F
 
-    override fun animateShow(arrowContainer: ArrowContainer) {
-        arrowContainer.alpha = 0.0F
-        arrowContainer.scaleX = fromScale
-        arrowContainer.scaleY = fromScale
+    override fun animateShow(view: View) {
+        view.alpha = 0.0F
+        view.scaleX = fromScale
+        view.scaleY = fromScale
 
-        arrowContainer.animate()
+        view.animate()
             .alpha(1.0F)
             .scaleX(1.0F)
             .scaleY(1.0F)
@@ -18,8 +18,8 @@ open class ScaleAnimator : Animator() {
             .interpolator = getInterpolator()
     }
 
-    override fun animateHide(arrowContainer: ArrowContainer) {
-        arrowContainer.animate()
+    override fun animateHide(view: View) {
+        view.animate()
             .alpha(0.0F)
             .scaleX(fromScale)
             .scaleY(fromScale)

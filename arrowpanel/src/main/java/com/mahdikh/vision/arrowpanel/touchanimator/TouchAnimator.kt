@@ -1,13 +1,13 @@
 package com.mahdikh.vision.arrowpanel.touchanimator
 
 import android.animation.TimeInterpolator
-import com.mahdikh.vision.arrowpanel.widget.ArrowContainer
+import android.view.View
 
 abstract class TouchAnimator {
     private var duration: Long = 300
     private var interpolator: TimeInterpolator? = null
 
-    abstract fun animateOnTouch(arrowContainer: ArrowContainer, action: Int)
+    abstract fun animateOnTouch(view: View, action: Int)
 
     fun setDuration(duration: Long): TouchAnimator {
         this.duration = duration

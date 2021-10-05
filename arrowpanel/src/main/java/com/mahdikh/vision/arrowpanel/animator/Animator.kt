@@ -2,59 +2,60 @@ package com.mahdikh.vision.arrowpanel.animator
 
 import android.animation.TimeInterpolator
 import android.graphics.Canvas
+import android.view.View
 import androidx.annotation.CallSuper
 import com.mahdikh.vision.arrowpanel.touchanimator.TouchAnimator
 import com.mahdikh.vision.arrowpanel.widget.ArrowContainer
 
 abstract class Animator {
     private var touchAnimator: TouchAnimator? = null
-    private var arrowContainer: ArrowContainer? = null
+    private var view: View? = null
     private var interpolator: TimeInterpolator? = null
     private var duration: Long = 250
 
     @CallSuper
-    open fun initBeforeShow(arrowContainer: ArrowContainer) {
-        this.arrowContainer = arrowContainer
+    open fun initBeforeShow(view: View) {
+        this.view = view
     }
 
-    abstract fun animateShow(arrowContainer: ArrowContainer)
+    abstract fun animateShow(view: View)
 
-    abstract fun animateHide(arrowContainer: ArrowContainer)
+    abstract fun animateHide(view: View)
 
-    open fun animateOnTouch(arrowContainer: ArrowContainer, action: Int) {
-        touchAnimator?.animateOnTouch(arrowContainer, action)
+    open fun animateOnTouch(view: View, action: Int) {
+        touchAnimator?.animateOnTouch(view, action)
     }
 
     open fun draw(canvas: Canvas) {
     }
 
     fun invalidate() {
-        arrowContainer?.invalidate()
+        view?.invalidate()
     }
 
     fun getWidth(): Int {
-        arrowContainer?.let {
+        view?.let {
             return it.measuredWidth
         }
         return 0
     }
 
     fun getHeight(): Int {
-        arrowContainer?.let {
+        view?.let {
             return it.measuredHeight
         }
         return 0
     }
 
     fun getPivotX(): Float {
-        arrowContainer?.let {
+        view?.let {
             return it.pivotX
         }
         return 0.0F
     }
 
     fun getPivotY(): Float {
-        arrowContainer?.let {
+        view?.let {
             return it.pivotY
         }
         return 0.0F
@@ -77,8 +78,6 @@ abstract class Animator {
     fun getDuration(): Long {
         return duration
     }
-
-    fun getArrowContainer(): ArrowContainer? = arrowContainer
 
     fun setTouchAnimator(touchAnimator: TouchAnimator): Animator {
         this.touchAnimator = touchAnimator

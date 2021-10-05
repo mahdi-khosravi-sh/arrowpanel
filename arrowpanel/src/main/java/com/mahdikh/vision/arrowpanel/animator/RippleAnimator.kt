@@ -3,6 +3,7 @@ package com.mahdikh.vision.arrowpanel.animator
 import android.animation.ValueAnimator
 import android.graphics.Canvas
 import android.graphics.Path
+import android.view.View
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.mahdikh.vision.arrowpanel.widget.ArrowContainer
 import kotlin.math.max
@@ -15,11 +16,11 @@ open class RippleAnimator : Animator() {
         setInterpolator(FastOutSlowInInterpolator())
     }
 
-    override fun animateShow(arrowContainer: ArrowContainer) {
+    override fun animateShow(view: View) {
         startRipple(true)
     }
 
-    override fun animateHide(arrowContainer: ArrowContainer) {
+    override fun animateHide(view: View) {
         startRipple(false)
     }
 
