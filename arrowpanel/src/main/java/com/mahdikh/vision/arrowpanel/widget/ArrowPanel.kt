@@ -218,7 +218,6 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
                 target.getLocationInWindow(targetLocation)
             }
             arrowContainer.targetView = target
-            arrowContainer.setTargetLocation(targetLocation[0], targetLocation[1])
 
             var y: Float
             var x: Float
@@ -354,6 +353,7 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
             arrowContainer.y = y
             arrowContainer.x = x
         }
+        arrowContainer.setTargetLocation(targetLocation[0], targetLocation[1])
     }
 
     open fun removeView() {
