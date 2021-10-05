@@ -14,7 +14,7 @@ class ArrowTip private constructor(context: Context) : ArrowPanel(context) {
 
     init {
         setDim(Color.BLACK, 0.0f)
-        setInteractionWhenTouchOutside(true)
+        setInteractionTouchOutside(true)
         val view = setContentView(R.layout.arrowtip_simple_text)
         textView = view.findViewById(R.id.textView)
 

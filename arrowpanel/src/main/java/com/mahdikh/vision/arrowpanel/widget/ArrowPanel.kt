@@ -25,29 +25,29 @@ import com.mahdikh.vision.arrowpanel.animator.Animator
 open class ArrowPanel constructor(context: Context) : FrameLayout(context), ArrowInterface {
     private val targetLocation: IntArray = IntArray(2)
     private var blurView: BlurView? = null
+    open var targetView: View? = null
+    var arrowContainer: ArrowContainer
+        private set
 
-    var targetView: View? = null
-    var drawTargetView: Boolean = true
-    var cancelableOnTouchOutside: Boolean = true
+    open var blurQuality: Int = 10
+    open var blurRadius: Float = 5.0F
+    open var arrowMargin: Int = 5
+    open var drawTargetView: Boolean = true
+    open var createAsWindow = false
+    private var mCanceled = false
+    private var mDismissed = false
+
+    open var cancelable: Boolean = true
+    open var cancelableOnTouchOutside: Boolean = true
         set(value) {
             field = value
             isFocusable = value
         }
-    var cancelable: Boolean = true
-    var blurQuality: Int = 10
-    var blurRadius: Float = 5.0F
-    var arrowMargin: Int = 5
-    var createAsWindow = false
 
-    private var mCanceled = false
-    private var mDismissed = false
-
-    var orientation = ORIENTATION_HORIZONTAL or ORIENTATION_VERTICAL
-    var arrowContainer: ArrowContainer
-        private set
+    open var orientation = ORIENTATION_HORIZONTAL or ORIENTATION_VERTICAL
 
     @DurationDef
-    var timeOutDuration: Long = DURATION_INFINITE
+    open var timeOutDuration: Long = DURATION_INFINITE
         set(value) {
             if (value == DURATION_INFINITE && field != DURATION_INFINITE) {
                 removeCallbacks(dismissRunnable)
@@ -74,57 +74,6 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         super.setWillNotDraw(false)
     }
 
-    protected open fun createBlurView() {
-        blurView = BlurView(context).also {
-            it.addNoBlurView(this)
-            it.setOverlapView(this)
-            it.layoutParams = LayoutParams(
-                LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT
-            )
-            if (drawTargetView) {
-                targetView?.let { target ->
-                    it.addNoBlurView(target)
-                }
-            }
-        }
-        addView(blurView, 0)
-    }
-
-    fun setAnimator(animator: Animator?) {
-        arrowContainer.animator = animator
-    }
-
-    private fun addAsWindow() {
-        val context = context
-        val manager = getWindowManager(context)
-        val size = getScreenSize(context)
-        val params = LayoutParams(
-            size.x, size.y,
-            WindowManager.LayoutParams.TYPE_APPLICATION,
-            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
-                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-            PixelFormat.TRANSLUCENT
-        )
-        params.gravity = Gravity.LEFT or Gravity.TOP
-        addView(arrowContainer)
-        manager.addView(this, params)
-    }
-
-    private fun addInRootViewGroup() {
-        getRootViewGroup()?.let { rootView ->
-            layoutParams = LayoutParams(
-                WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.MATCH_PARENT
-            )
-            addView(arrowContainer)
-            rootView.addView(this)
-        } ?: kotlin.run {
-            createAsWindow = true
-            addAsWindow()
-        }
-    }
-
     open fun show() {
         if (createAsWindow) {
             addAsWindow()
@@ -134,6 +83,49 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
             showArrowLayout()
             requestFocus()
         }
+    }
+
+    open fun show(targetView: View) {
+        this.targetView = targetView
+        show()
+    }
+
+    open fun show(motionEvent: MotionEvent) {
+        targetLocation[0] = motionEvent.rawX.toInt()
+        targetLocation[1] = motionEvent.rawY.toInt()
+        show()
+    }
+
+    override fun dismiss() {
+        if (!mDismissed) {
+            arrowContainer.hide()
+            removeView()
+            mDismissed = true
+            onDismissListener?.onDismiss(this)
+        }
+    }
+
+    override fun cancel() {
+        if (!mCanceled) {
+            mCanceled = true
+            onCancelListener?.onCancel(this)
+            dismiss()
+        }
+    }
+
+    open fun removeView() {
+        animate()
+            .alpha(0.0F)
+            .setDuration(200)
+            .withEndAction {
+                removeView(blurView)
+                blurView = null
+                if (createAsWindow) {
+                    getWindowManager(context).removeViewImmediate(this)
+                } else {
+                    getRootViewGroup()?.removeView(this)
+                }
+            }
     }
 
     private fun showArrowLayout() {
@@ -152,54 +144,6 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         if (timeOutDuration != DURATION_INFINITE) {
             postDelayed(dismissRunnable, timeOutDuration)
         }
-    }
-
-    fun isShowing(): Boolean {
-        return isAttachedToWindow and isVisible
-    }
-
-    override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
-        if (event?.keyCode == KeyEvent.KEYCODE_BACK) {
-            if (event.action == KeyEvent.ACTION_UP) {
-                onBackPressed()
-                return true
-            }
-        }
-        return super.dispatchKeyEvent(event)
-    }
-
-    open fun onBackPressed() {
-        if (cancelable) {
-            cancel()
-        }
-    }
-
-    fun setContentView(layoutId: Int): View {
-        return arrowContainer.inflateLayout(layoutId)
-    }
-
-    fun setContentView(view: View): View {
-        arrowContainer.removeAllViews()
-        arrowContainer.addView(view)
-        return view
-    }
-
-    open fun resetTimeout() {
-        removeCallbacks(dismissRunnable)
-        if (timeOutDuration != DURATION_INFINITE) {
-            postDelayed(dismissRunnable, timeOutDuration)
-        }
-    }
-
-    open fun show(targetView: View) {
-        this.targetView = targetView
-        show()
-    }
-
-    open fun show(motionEvent: MotionEvent) {
-        targetLocation[0] = motionEvent.rawX.toInt()
-        targetLocation[1] = motionEvent.rawY.toInt()
-        show()
     }
 
     private fun adjustArrowLayoutLocation() {
@@ -356,43 +300,57 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         arrowContainer.setTargetLocation(targetLocation[0], targetLocation[1])
     }
 
-    open fun removeView() {
-        animate()
-            .alpha(0.0F)
-            .setDuration(200)
-            .withEndAction {
-                removeView(blurView)
-                blurView = null
-                if (createAsWindow) {
-                    getWindowManager(context).removeViewImmediate(this)
-                } else {
-                    getRootViewGroup()?.removeView(this)
-                }
+    private fun addAsWindow() {
+        val context = context
+        val manager = getWindowManager(context)
+        val size = getScreenSize(context)
+        val params = LayoutParams(
+            size.x, size.y,
+            WindowManager.LayoutParams.TYPE_APPLICATION,
+            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
+                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            PixelFormat.TRANSLUCENT
+        )
+        params.gravity = Gravity.LEFT or Gravity.TOP
+        addView(arrowContainer)
+        manager.addView(this, params)
+    }
+
+    private fun addInRootViewGroup() {
+        getRootViewGroup()?.let { rootView ->
+            layoutParams = LayoutParams(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT
+            )
+            addView(arrowContainer)
+            rootView.addView(this)
+        } ?: kotlin.run {
+            createAsWindow = true
+            addAsWindow()
+        }
+    }
+
+    override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
+        if (event?.keyCode == KeyEvent.KEYCODE_BACK) {
+            if (event.action == KeyEvent.ACTION_UP) {
+                onBackPressed()
+                return true
             }
+        }
+        return super.dispatchKeyEvent(event)
     }
 
-    override fun dismiss() {
-        if (!mDismissed) {
-            arrowContainer.hide()
-            removeView()
-            mDismissed = true
-            onDismissListener?.onDismiss(this)
-        }
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        cancel()
     }
 
-    override fun cancel() {
-        if (!mCanceled) {
-            mCanceled = true
-            onCancelListener?.onCancel(this)
-            dismiss()
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (cancelableOnTouchOutside && event!!.action == MotionEvent.ACTION_DOWN) {
+            cancel()
         }
-    }
-
-    protected open fun getRootViewGroup(): ViewGroup? {
-        if (context is FragmentActivity) {
-            return (context as FragmentActivity).window.decorView.rootView as ViewGroup
-        }
-        return null
+        return super.onTouchEvent(event)
     }
 
     override fun onDrawForeground(canvas: Canvas) {
@@ -410,80 +368,79 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         }
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration?) {
-        super.onConfigurationChanged(newConfig)
-        cancel()
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (cancelableOnTouchOutside && event!!.action == MotionEvent.ACTION_DOWN) {
-            cancel()
-        }
-        return super.onTouchEvent(event)
-    }
-
     override fun setLayoutDirection(layoutDirection: Int) {
         arrowContainer.layoutDirection = layoutDirection
     }
 
-    fun setOnShowListener(onShowListener: ArrowInterface.OnShowListener?) {
-        this.onShowListener = onShowListener
-    }
-
-    fun setOnDismissListener(onDismissListener: ArrowInterface.OnDismissListener?) {
-        this.onDismissListener = onDismissListener
-    }
-
-    fun setOnCancelListener(onCancelListener: ArrowInterface.OnCancelListener?) {
-        this.onCancelListener = onCancelListener
-    }
-
-    open fun getBlurView(): BlurView? {
-        return blurView
-    }
-
-    companion object {
-        const val DURATION_INFINITE: Long = -1
-        const val DURATION_SHORT: Long = 4000
-        const val DURATION_MEDIUM: Long = 5500
-        const val DURATION_LONG: Long = 7000
-
-        const val ORIENTATION_HORIZONTAL = 1
-        const val ORIENTATION_VERTICAL = 2
-
-        @kotlin.annotation.Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
-        @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
-        @LongDef(DURATION_INFINITE, DURATION_SHORT, DURATION_MEDIUM, DURATION_LONG)
-        annotation class DurationDef
-
-        @JvmStatic
-        private fun getScreenSize(context: Context): Point {
-            val point = Point()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                context.display?.let {
-                    val metrics = DisplayMetrics()
-                    it.getRealMetrics(metrics)
-                    point.set(metrics.widthPixels, metrics.heightPixels)
-                } ?: kotlin.run {
-                    val manager = getWindowManager(context)
-                    val windowMetrics = manager.currentWindowMetrics
-                    val bounds = windowMetrics.bounds
-                    point.set(bounds.width(), bounds.height())
+    protected open fun createBlurView() {
+        blurView = BlurView(context).also {
+            it.addNoBlurView(this)
+            it.setOverlapView(this)
+            it.layoutParams = LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT
+            )
+            if (drawTargetView) {
+                targetView?.let { target ->
+                    it.addNoBlurView(target)
                 }
-            } else {
-                val manager = getWindowManager(context)
-                val metrics = DisplayMetrics()
-                manager.defaultDisplay.getRealMetrics(metrics)
-                point.set(metrics.widthPixels, metrics.heightPixels)
             }
-            return point
         }
+        addView(blurView, 0)
+    }
 
-        @JvmStatic
-        private fun getWindowManager(context: Context): WindowManager {
-            return context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+    open fun onBackPressed() {
+        if (cancelable) {
+            cancel()
         }
+    }
+
+    open fun resetTimeout() {
+        removeCallbacks(dismissRunnable)
+        if (timeOutDuration != DURATION_INFINITE) {
+            postDelayed(dismissRunnable, timeOutDuration)
+        }
+    }
+
+    open fun setAnimator(animator: Animator?) {
+        arrowContainer.animator = animator
+    }
+
+    open fun getAnimator(): Animator? {
+        return arrowContainer.animator
+    }
+
+    open fun isShowing(): Boolean {
+        return isAttachedToWindow and isVisible
+    }
+
+    open fun setInteractionTouchOutside(interaction: Boolean) {
+        isClickable = !interaction
+    }
+
+    open fun setContentView(layoutId: Int): View {
+        return arrowContainer.inflateLayout(layoutId)
+    }
+
+    open fun setContentView(view: View): View {
+        arrowContainer.removeAllViews()
+        arrowContainer.addView(view)
+        return view
+    }
+
+    open fun getContentView(): View {
+        return arrowContainer
+    }
+
+    open fun findView(id: Int): View {
+        return arrowContainer.findViewById(id)
+    }
+
+    protected open fun getRootViewGroup(): ViewGroup? {
+        if (context is FragmentActivity) {
+            return (context as FragmentActivity).window.decorView.rootView as ViewGroup
+        }
+        return null
     }
 
     open fun setStrokeWidth(strokeWidth: Float) {
@@ -510,16 +467,12 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         arrowContainer.arrowHeight = arrowHeight
     }
 
-    fun clearShadow() {
-        arrowContainer.clearShadow()
-    }
-
-    fun setShadow(radius: Float, dx: Float, dy: Float, shadowColor: Int) {
+    open fun setShadow(radius: Float, dx: Float, dy: Float, shadowColor: Int) {
         arrowContainer.setShadow(radius, dx, dy, shadowColor)
     }
 
-    open fun setInteractionWhenTouchOutside(interaction: Boolean) {
-        isClickable = !interaction
+    open fun clearShadow() {
+        arrowContainer.clearShadow()
     }
 
     open fun setDrawBlurEffect(drawBlurEffect: Boolean) {
@@ -541,16 +494,30 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         )
     }
 
-    fun setDrawArrow(drawArrow: Boolean) {
+    open fun setDrawArrow(drawArrow: Boolean) {
         arrowContainer.drawArrow = drawArrow
     }
 
-    fun getContentView(): View {
-        return arrowContainer
+    open fun setLocation(x: Int, y: Int) {
+        targetLocation[0] = x
+        targetLocation[1] = y
     }
 
-    fun findViewInContentView(id: Int): View {
-        return arrowContainer.findViewById(id)
+    open fun setLocation(motionEvent: MotionEvent) {
+        targetLocation[0] = motionEvent.rawX.toInt()
+        targetLocation[1] = motionEvent.rawY.toInt()
+    }
+
+    open fun setOnShowListener(onShowListener: ArrowInterface.OnShowListener?) {
+        this.onShowListener = onShowListener
+    }
+
+    open fun setOnDismissListener(onDismissListener: ArrowInterface.OnDismissListener?) {
+        this.onDismissListener = onDismissListener
+    }
+
+    open fun setOnCancelListener(onCancelListener: ArrowInterface.OnCancelListener?) {
+        this.onCancelListener = onCancelListener
     }
 
     open fun setOnChildClickListener(
@@ -581,16 +548,6 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         for (i in 0 until size) {
             arrowContainer.findViewById<View>(ids[i]).setOnLongClickListener(childLongClickListener)
         }
-    }
-
-    open fun setLocation(x: Int, y: Int) {
-        targetLocation[0] = x
-        targetLocation[1] = y
-    }
-
-    open fun setLocation(motionEvent: MotionEvent) {
-        targetLocation[0] = motionEvent.rawX.toInt()
-        targetLocation[1] = motionEvent.rawY.toInt()
     }
 
     open class Builder(context: Context) {
@@ -677,7 +634,7 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         }
 
         open fun setInteractionWhenTouchOutside(interaction: Boolean): Builder {
-            arrowPanel.setInteractionWhenTouchOutside(interaction)
+            arrowPanel.setInteractionTouchOutside(interaction)
             return this
         }
 
@@ -783,6 +740,49 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
             val p = build()
             p.show(motionEvent)
             return p
+        }
+    }
+
+    companion object {
+        const val DURATION_INFINITE: Long = -1
+        const val DURATION_SHORT: Long = 4000
+        const val DURATION_MEDIUM: Long = 5500
+        const val DURATION_LONG: Long = 7000
+
+        const val ORIENTATION_HORIZONTAL = 1
+        const val ORIENTATION_VERTICAL = 2
+
+        @kotlin.annotation.Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
+        @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
+        @LongDef(DURATION_INFINITE, DURATION_SHORT, DURATION_MEDIUM, DURATION_LONG)
+        annotation class DurationDef
+
+        @JvmStatic
+        private fun getScreenSize(context: Context): Point {
+            val point = Point()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                context.display?.let {
+                    val metrics = DisplayMetrics()
+                    it.getRealMetrics(metrics)
+                    point.set(metrics.widthPixels, metrics.heightPixels)
+                } ?: kotlin.run {
+                    val manager = getWindowManager(context)
+                    val windowMetrics = manager.currentWindowMetrics
+                    val bounds = windowMetrics.bounds
+                    point.set(bounds.width(), bounds.height())
+                }
+            } else {
+                val manager = getWindowManager(context)
+                val metrics = DisplayMetrics()
+                manager.defaultDisplay.getRealMetrics(metrics)
+                point.set(metrics.widthPixels, metrics.heightPixels)
+            }
+            return point
+        }
+
+        @JvmStatic
+        private fun getWindowManager(context: Context): WindowManager {
+            return context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         }
     }
 
