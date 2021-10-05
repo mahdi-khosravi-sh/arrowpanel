@@ -19,9 +19,13 @@ class ArrowTip private constructor(context: Context) : ArrowPanel(context) {
         textView = view.findViewById(R.id.textView)
 
         setAnimator(
-            ScaleAnimator().setInterpolator(OvershootInterpolator()).setDuration(350)
+            ScaleAnimator()
+                .setInterpolator(OvershootInterpolator())
+                .setDuration(350)
                 .setTouchAnimator(
-                    ScaleTouchAnimator().setDuration(250).setInterpolator(OvershootInterpolator())
+                    ScaleTouchAnimator()
+                        .setDuration(250)
+                        .setInterpolator(OvershootInterpolator())
                 )
         )
     }
