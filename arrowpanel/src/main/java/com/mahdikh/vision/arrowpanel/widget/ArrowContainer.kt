@@ -275,8 +275,10 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
             var leftPointX: Float = centerPointX - arrowWidth / 2F
             var rightPointX: Float = leftPointX + arrowWidth
 
+            var arrowInLeftSide = false
             when {
                 leftPointX < arrowHeight + cornerRadius -> {
+                    arrowInLeftSide = true
                     leftPointX = cornerRadius + arrowHeight
                     rightPointX = leftPointX + arrowWidth
 
@@ -294,6 +296,7 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
                     //Left
                 }
                 rightPointX > measuredWidth - arrowHeight - cornerRadius -> {
+                    arrowInLeftSide = false
                     rightPointX = measuredWidth - cornerRadius - arrowHeight
                     leftPointX = rightPointX - arrowWidth
                     //Rights
@@ -319,9 +322,24 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
                     pointY = arrowHeight.toFloat() + halfStroke
                     centerPointY = 0.0F
 
-                    arrowPath.moveTo(rightPointX, pointY)
-                    arrowPath.lineTo(centerPointX, centerPointY)
-                    arrowPath.lineTo(leftPointX, pointY)
+                    if (arrowInLeftSide) {
+                        if (cornerRadius > rightPointX) {
+                            arrowPath.moveTo(cornerRadius * 1.3F, pointY)
+                            arrowPath.lineTo(rightPointX, pointY)
+                        } else {
+                            arrowPath.moveTo(rightPointX, pointY)
+                        }
+                        arrowPath.lineTo(centerPointX, centerPointY)
+                        arrowPath.lineTo(leftPointX, pointY)
+                    } else {
+                        arrowPath.moveTo(rightPointX, pointY)
+                        arrowPath.lineTo(centerPointX, centerPointY)
+                        arrowPath.lineTo(leftPointX, pointY)
+
+                        if (cornerRadius > arrowWidth) {
+                            arrowPath.lineTo(leftPointX - (cornerRadius - arrowWidth), pointY)
+                        }
+                    }
 
                     if (edgePointX != -1.0F && edgePointY != -1.0F) {
                         arrowPath.lineTo(edgePointX, edgePointY)
@@ -330,15 +348,22 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
                 else -> {
                     pointY = (measuredHeight - arrowHeight).toFloat() - halfStroke
                     centerPointY = measuredHeight.toFloat()
-
                     if (edgePointX != -1.0F && edgePointY != -1.0F) {
                         arrowPath.moveTo(edgePointX, height - edgePointY)
+                        if (!arrowInLeftSide && cornerRadius > arrowWidth) {
+                            arrowPath.lineTo(leftPointX - (cornerRadius - arrowWidth), pointY)
+                        }
                         arrowPath.lineTo(leftPointX, pointY)
                     } else {
                         arrowPath.moveTo(leftPointX, pointY)
                     }
+
                     arrowPath.lineTo(centerPointX, centerPointY)
                     arrowPath.lineTo(rightPointX, pointY)
+
+                    if (arrowInLeftSide && cornerRadius > arrowWidth) {
+                        arrowPath.lineTo(cornerRadius * 1.3F, pointY)
+                    }
                 }
             }
 
