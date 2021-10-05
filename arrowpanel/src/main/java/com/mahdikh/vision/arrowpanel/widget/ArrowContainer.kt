@@ -323,7 +323,7 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
                     centerPointY = 0.0F
 
                     if (arrowInLeftSide) {
-                        if (cornerRadius > rightPointX) {
+                        if (cornerRadius > arrowWidth) {
                             arrowPath.moveTo(cornerRadius * 1.3F, pointY)
                             arrowPath.lineTo(rightPointX, pointY)
                         } else {
