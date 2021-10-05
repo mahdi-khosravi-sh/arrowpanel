@@ -29,6 +29,10 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
     var targetView: View? = null
     var drawTargetView: Boolean = true
     var cancelableOnTouchOutside: Boolean = true
+        set(value) {
+            field = value
+            isFocusable = value
+        }
     var cancelable: Boolean = true
     var blurQuality: Int = 10
     var blurRadius: Float = 5.0F
@@ -38,7 +42,7 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
     private var mCanceled = false
     private var mDismissed = false
 
-    var orientation = ORIENTATION_HORIZONTAL
+    var orientation = ORIENTATION_HORIZONTAL or ORIENTATION_VERTICAL
     var arrowContainer: ArrowContainer
         private set
 
@@ -671,13 +675,12 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         }
 
         open fun setCancelableOnTouchOutside(cancel: Boolean): Builder {
-            arrowPanel.isFocusable = cancel
             arrowPanel.cancelableOnTouchOutside = cancel
             return this
         }
 
         open fun setInteractionWhenTouchOutside(interaction: Boolean): Builder {
-            arrowPanel.isClickable = !interaction
+            arrowPanel.setInteractionWhenTouchOutside(interaction)
             return this
         }
 
@@ -726,7 +729,7 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
             return this
         }
 
-        open fun setTargetView(targetView: View): Builder {
+        open fun setTargetView(targetView: View?): Builder {
             arrowPanel.targetView = targetView
             return this
         }
@@ -743,6 +746,23 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
 
         open fun setCreateAsWindow(asWindow: Boolean): Builder {
             arrowPanel.createAsWindow = asWindow
+            return this
+        }
+
+
+        open fun setOnChildClickListener(
+            onChildClickListener: ArrowInterface.OnChildClickListener?,
+            vararg ids: Int
+        ): Builder {
+            arrowPanel.setOnChildClickListener(onChildClickListener, *ids)
+            return this
+        }
+
+        open fun setOnChildLongClickListener(
+            onChildLongClickListener: ArrowInterface.OnChildLongClickListener?,
+            vararg ids: Int
+        ): Builder {
+            arrowPanel.setOnChildLongClickListener(onChildLongClickListener, *ids)
             return this
         }
 
