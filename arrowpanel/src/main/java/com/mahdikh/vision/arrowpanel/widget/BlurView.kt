@@ -10,23 +10,14 @@ import android.renderscript.Allocation
 import android.renderscript.Element
 import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicBlur
-import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import java.util.*
 
-class BlurView : View {
+class BlurView(context: Context?) : View(context) {
     private val noBlurViews: MutableList<View> = mutableListOf()
     private var overlapView: View? = null
-
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
-        context,
-        attrs,
-        defStyleAttr
-    )
 
     private fun blur(context: Context, source: Bitmap, radius: Float): Bitmap {
         val outputBitmap = Bitmap.createBitmap(source)
@@ -111,10 +102,6 @@ class BlurView : View {
         if (!noBlurViews.contains(view)) {
             noBlurViews.add(view)
         }
-    }
-
-    fun removeNoBlurView(view: View) {
-        noBlurViews.remove(view)
     }
 
     fun setOverlapView(overlapView: View?) {
