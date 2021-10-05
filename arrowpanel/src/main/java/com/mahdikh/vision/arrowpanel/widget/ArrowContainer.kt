@@ -211,7 +211,6 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
         if (drawArrow) {
             if (syncArrowLocation) {
                 targetView?.let { target ->
-                    target.getLocationOnScreen(targetLocation)
                     if (y + measuredHeight <= targetLocation[1]) {
                         adjustPath(Gravity.BOTTOM)
                     } else if (y >= targetLocation[1]) {

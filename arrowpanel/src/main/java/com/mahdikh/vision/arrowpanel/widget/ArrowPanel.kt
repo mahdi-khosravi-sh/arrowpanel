@@ -137,11 +137,6 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
     }
 
     private fun showArrowLayout() {
-        if (targetView != null) {
-            arrowContainer.targetView = targetView
-        } else {
-            arrowContainer.setTargetLocation(targetLocation[0], targetLocation[1])
-        }
         adjustArrowLayoutLocation()
         animate().alpha(1.0F).duration = 150
         arrowContainer.show()
@@ -222,6 +217,8 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
             } else {
                 target.getLocationInWindow(targetLocation)
             }
+            arrowContainer.targetView = target
+            arrowContainer.setTargetLocation(targetLocation[0], targetLocation[1])
 
             var y: Float
             var x: Float
