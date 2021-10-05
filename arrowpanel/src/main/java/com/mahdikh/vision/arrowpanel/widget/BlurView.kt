@@ -28,47 +28,8 @@ class BlurView : View {
         defStyleAttr
     )
 
-    fun asyncBlur(
-        sourceView: View,
-        quality: Int,
-        radius: Float,
-        cleverBlur: Boolean,
-        endAction: Runnable?
-    ) {
-        val visibility = visibility
-        setVisibility(INVISIBLE)
-        val visibilities: List<Int> = getNoBlurViewsVisibilities()
-        setNoBlurViewsInvisible()
-
-        Thread {
-            val sourceBitmap: Bitmap? = getBitmap(sourceView, quality, cleverBlur)
-            this@BlurView.post {
-                setVisibility(visibility)
-                setNoBlurViewsVisibilities(visibilities)
-            }
-            val blurBitmap = blur(context, sourceBitmap, radius)
-            post {
-                adjustBackground(blurBitmap)
-                endAction?.run()
-            }
-        }.start()
-    }
-
-    fun asyncBlur(
-        sourceView: View,
-        @QualityDef quality: Int,
-        radius: Float,
-        withEndAction: Runnable?
-    ) {
-        asyncBlur(sourceView, quality, radius, true, withEndAction!!)
-    }
-
-    fun asyncBlur(sourceView: View, @QualityDef quality: Int, radius: Float) {
-        asyncBlur(sourceView, quality, radius, true, null)
-    }
-
-    private fun blur(context: Context, source: Bitmap?, radius: Float): Bitmap {
-        val outputBitmap = Bitmap.createBitmap(source!!)
+    private fun blur(context: Context, source: Bitmap, radius: Float): Bitmap {
+        val outputBitmap = Bitmap.createBitmap(source)
         val renderScript = RenderScript.create(context)
         renderScript.setPriority(RenderScript.Priority.NORMAL)
         val tmpIn = Allocation.createFromBitmap(
@@ -105,12 +66,8 @@ class BlurView : View {
         adjustBackground(blurBitmap)
     }
 
-    fun blur(sourceView: View, @QualityDef quality: Int, radius: Float) {
-        blur(sourceView, quality, radius, true)
-    }
-
-    private fun getBitmap(sourceView: View, quality: Int, clever: Boolean): Bitmap? {
-        val sourceBitmap: Bitmap? = if (clever) {
+    private fun getBitmap(sourceView: View, quality: Int, clever: Boolean): Bitmap {
+        val sourceBitmap: Bitmap = if (clever) {
             val rect = Rect(left, top, right, bottom)
             drawToBitmap(sourceView, rect, quality.toFloat())
         } else {
@@ -137,10 +94,6 @@ class BlurView : View {
         for (view in noBlurViews) {
             view.visibility = INVISIBLE
         }
-    }
-
-    private fun setVisibility(view: View, visibility: Int) {
-        view.visibility = visibility
     }
 
     private fun adjustBackground(bitmap: Bitmap) {
@@ -182,7 +135,7 @@ class BlurView : View {
             sourceView: View,
             rect: Rect?,
             @QualityDef quality: Float
-        ): Bitmap? {
+        ): Bitmap {
             var bitmap =
                 Bitmap.createBitmap(sourceView.width, sourceView.height, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(bitmap)
