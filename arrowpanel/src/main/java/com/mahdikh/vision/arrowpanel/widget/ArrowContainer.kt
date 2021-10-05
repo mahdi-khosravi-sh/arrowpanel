@@ -11,28 +11,27 @@ import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
+import androidx.annotation.CallSuper
 import androidx.annotation.ColorInt
 import androidx.annotation.IntDef
 import androidx.core.view.setPadding
 import com.mahdikh.vision.arrowpanel.R
 import com.mahdikh.vision.arrowpanel.animator.Animator
 
-class ArrowContainer(context: Context) : FrameLayout(context) {
-    private val strokePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val paint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
-
-    private val path: Path = Path()
+open class ArrowContainer(context: Context) : FrameLayout(context) {
+    val strokePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    val paint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val arrowPath: Path = Path()
-
+    private val path: Path = Path()
     private val targetLocation: IntArray = IntArray(2)
-    private var arrowEdge: Int = Gravity.NO_GRAVITY
-
     private var firstYAxis: Float = 0.0F
     private var firstXAxis: Float = 0.0F
-
-    private var syncArrowLocation = true
-    var drawArrow: Boolean = true
-    var cornerRadius: Float = 15.0F
+    protected open var syncArrowPath = true
+    open var drawArrow: Boolean = true
+    open var cornerRadius: Float = 15.0F
+    private var drawStroke = false
+    var arrowEdge: Int = Gravity.NO_GRAVITY
+        private set
 
     var arrowWidth: Int = 20
     var arrowHeight: Int = 15
@@ -41,13 +40,13 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
             setPadding(value)
         }
 
-    var targetView: View? = null
+    open var targetView: View? = null
         set(value) {
             field = value
             invalidate()
         }
 
-    var animator: Animator? = null
+    open var animator: Animator? = null
         set(value) {
             field = value
             if (!isAttachedToWindow) {
@@ -60,7 +59,7 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
 
         isClickable = true
         isFocusable = true
-        setWillNotDraw(false)
+        super.setWillNotDraw(false)
 
         paint.color = Color.WHITE
 
@@ -127,57 +126,12 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
         a.recycle()
     }
 
-    fun inflateLayout(layoutId: Int): View {
-        return inflate(context, layoutId, this)
-    }
-
-    fun setFillColor(@ColorInt color: Int) {
-        paint.color = color
-    }
-
-    fun setStrokeColor(@ColorInt color: Int) {
-        strokePaint.color = color
-    }
-
-    fun setStrokeWidth(strokeWidth: Float) {
-        strokePaint.strokeWidth = strokeWidth
-    }
-
-    fun setTargetLocation(x: Int, y: Int) {
-        targetLocation[0] = x
-        targetLocation[1] = y
-    }
-
-    fun getArrowEdge(): Int {
-        return arrowEdge
-    }
-
-    fun clearShadow() {
-        strokePaint.clearShadowLayer()
-        paint.clearShadowLayer()
-    }
-
-    fun setShadow(radius: Float, dx: Float, dy: Float, shadowColor: Int) {
-        paint.setShadowLayer(radius, dx, dy, shadowColor)
-    }
-
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         val action = ev.action
         if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP) {
             animator?.animateOnTouch(this, action)
         }
         return super.dispatchTouchEvent(ev)
-    }
-
-    fun show() {
-        firstYAxis = y
-        firstXAxis = x
-        animator?.animateShow(this)
-    }
-
-    fun hide() {
-        syncArrowLocation = false
-        animator?.animateHide(this)
     }
 
     override fun draw(canvas: Canvas) {
@@ -189,10 +143,22 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
         super.onDraw(canvas)
         adjustPath()
         canvas.drawPath(path, paint)
-
-        if (strokePaint.strokeWidth > 0.0F) {
+        if (drawStroke) {
             canvas.drawPath(path, strokePaint)
         }
+    }
+
+    @CallSuper
+    open fun show() {
+        firstYAxis = y
+        firstXAxis = x
+        animator?.animateShow(this)
+    }
+
+    @CallSuper
+    open fun hide() {
+        syncArrowPath = false
+        animator?.animateHide(this)
     }
 
     private fun adjustPath() {
@@ -209,29 +175,29 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
         )
 
         if (drawArrow) {
-            if (syncArrowLocation) {
+            if (syncArrowPath) {
                 targetView?.let { target ->
                     if (y + measuredHeight <= targetLocation[1]) {
-                        adjustPath(Gravity.BOTTOM)
+                        adjustArrowPath(Gravity.BOTTOM)
                     } else if (y >= targetLocation[1]) {
-                        adjustPath(Gravity.TOP)
+                        adjustArrowPath(Gravity.TOP)
                     } else {
                         if ((x > targetLocation[0] && x < targetLocation[0] + target.width) or (x > targetLocation[0] + target.width / 2)) {
-                            adjustPath(Gravity.LEFT)
+                            adjustArrowPath(Gravity.LEFT)
                         } else {
-                            adjustPath(Gravity.RIGHT)
+                            adjustArrowPath(Gravity.RIGHT)
                         }
                     }
                 } ?: kotlin.run {
                     if (firstYAxis + measuredHeight <= targetLocation[1]) {
-                        adjustPath(Gravity.BOTTOM)
+                        adjustArrowPath(Gravity.BOTTOM)
                     } else if (firstYAxis >= targetLocation[1]) {
-                        adjustPath(Gravity.TOP)
+                        adjustArrowPath(Gravity.TOP)
                     } else {
                         if (firstXAxis < targetLocation[0]) {
-                            adjustPath(Gravity.RIGHT)
+                            adjustArrowPath(Gravity.RIGHT)
                         } else {
-                            adjustPath(Gravity.LEFT)
+                            adjustArrowPath(Gravity.LEFT)
                         }
                     }
                 }
@@ -242,7 +208,7 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
     }
 
     @SuppressLint("RtlHardcoded")
-    private fun adjustPath(@ArrowEdgeDef edge: Int) {
+    private fun adjustArrowPath(@ArrowEdgeDef edge: Int) {
         if (!arrowPath.isEmpty) {
             arrowPath.reset()
         }
@@ -409,6 +375,38 @@ class ArrowContainer(context: Context) : FrameLayout(context) {
             pivotY = centerPointY
         }
         arrowPath.close()
+    }
+
+    fun inflateLayout(layoutId: Int): View {
+        return inflate(context, layoutId, this)
+    }
+
+    open fun setFillColor(@ColorInt color: Int) {
+        paint.color = color
+    }
+
+    open fun setStrokeColor(@ColorInt color: Int) {
+        strokePaint.color = color
+    }
+
+    open fun setStrokeWidth(strokeWidth: Float) {
+        strokePaint.strokeWidth = strokeWidth
+        drawStroke = strokeWidth > 0.0F
+    }
+
+    @CallSuper
+    open fun setTargetLocation(x: Int, y: Int) {
+        targetLocation[0] = x
+        targetLocation[1] = y
+    }
+
+    open fun clearShadow() {
+        strokePaint.clearShadowLayer()
+        paint.clearShadowLayer()
+    }
+
+    open fun setShadow(radius: Float, dx: Float, dy: Float, shadowColor: Int) {
+        paint.setShadowLayer(radius, dx, dy, shadowColor)
     }
 
     @kotlin.annotation.Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
