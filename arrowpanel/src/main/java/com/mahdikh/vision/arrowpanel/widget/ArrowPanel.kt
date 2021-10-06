@@ -78,7 +78,9 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
     open fun show() {
         if (createAsWindow) {
             addAsWindow()
-            post { showArrowLayout() }
+            post {
+                showArrowLayout()
+            }
         } else {
             addInRootViewGroup()
             showArrowLayout()
@@ -135,6 +137,11 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
     private fun showArrowLayout() {
         adjustArrowLayoutLocation()
         animate().alpha(1.0F).duration = 150
+
+        if (createAsWindow) {
+            arrowContainer.requestLayout()
+        }
+
         arrowContainer.show()
         onShowListener?.onShow(this)
 
