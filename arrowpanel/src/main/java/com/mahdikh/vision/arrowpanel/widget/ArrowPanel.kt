@@ -163,8 +163,15 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         val pWidth = rootView.width
         val pHeight = rootView.height
 
-        val arrowLayoutWidth = arrowContainer.measuredWidth
-        val arrowLayoutHeight = arrowContainer.measuredHeight
+        var arrowLayoutWidth = arrowContainer.measuredWidth
+        var arrowLayoutHeight = arrowContainer.measuredHeight
+
+        if (arrowLayoutHeight > pHeight) {
+            arrowLayoutHeight = pHeight
+        }
+        if (arrowLayoutWidth > pWidth) {
+            arrowLayoutWidth = pWidth
+        }
 
         targetView?.let { target ->
             if (createAsWindow) {
