@@ -7,15 +7,16 @@ import android.view.View
 
 class WiggleAnimator : BaseAnimator() {
     override fun preAnimateShow(view: View) {
-        view.pivotX = view.measuredHeight / 2F
-        view.pivotY = view.measuredWidth / 2F
+        view.pivotX = view.measuredWidth / 2F
+        view.pivotY = view.measuredHeight / 2F
     }
 
     override fun animateShowImpl(view: View) {
         val pRotation = PropertyValuesHolder.ofKeyframe(
             "rotation",
-            Keyframe.ofFloat(0.2F, 4.0F),
-            Keyframe.ofFloat(0.4F, -4.0F),
+            Keyframe.ofFloat(0.0F, -3.0F),
+            Keyframe.ofFloat(0.2F, 3.0F),
+            Keyframe.ofFloat(0.4F, -3.0F),
             Keyframe.ofFloat(0.6F, 1.0F),
             Keyframe.ofFloat(0.8F, -1.0F),
             Keyframe.ofFloat(1.0F, 0.0F)

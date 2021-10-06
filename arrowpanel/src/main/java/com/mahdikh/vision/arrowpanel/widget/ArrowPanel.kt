@@ -256,7 +256,11 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
                             y = if (targetLocation[1] <= pHeight / 3) {
                                 (targetLocation[1] + arrowMargin).toFloat()
                             } else {
-                                (targetLocation[1] - arrowLayoutHeight - arrowMargin).toFloat()
+                                if (arrowLayoutHeight > targetLocation[1]) {
+                                    targetLocation[1].toFloat()
+                                } else {
+                                    (targetLocation[1] - arrowLayoutHeight - arrowMargin).toFloat()
+                                }
                             }
                         }
                         else -> {

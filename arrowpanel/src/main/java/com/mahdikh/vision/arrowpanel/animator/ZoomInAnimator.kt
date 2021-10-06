@@ -6,8 +6,8 @@ class ZoomInAnimator : BaseAnimator() {
     override fun preAnimateShow(view: View) {
         super.preAnimateShow(view)
         view.apply {
-            scaleX = 0.65F
-            scaleY = 0.65F
+            scaleX = 0.8F
+            scaleY = 0.8F
             pivotX = measuredWidth / 2F
             pivotY = measuredHeight / 2F
         }
