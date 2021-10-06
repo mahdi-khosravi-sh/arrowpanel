@@ -125,7 +125,7 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
                     removeView(blurView)
                     blurView = null
                 }
-                if (createAsWindow) {
+                if (createAsWindow && isAttachedToWindow) {
                     getWindowManager(context).removeViewImmediate(this@ArrowPanel)
                 } else {
                     getRootViewGroup()?.removeView(this@ArrowPanel)
