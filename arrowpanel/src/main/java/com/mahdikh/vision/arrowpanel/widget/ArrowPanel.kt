@@ -20,7 +20,8 @@ import androidx.annotation.LayoutRes
 import androidx.annotation.LongDef
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
-import com.mahdikh.vision.arrowpanel.animator.Animator
+import com.mahdikh.vision.arrowpanel.animator.BaseAnimator
+import com.mahdikh.vision.arrowpanel.touchanimator.TouchAnimator
 
 open class ArrowPanel constructor(context: Context) : FrameLayout(context), ArrowInterface {
     private val targetLocation: IntArray = IntArray(2)
@@ -114,18 +115,21 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
     }
 
     open fun removeView() {
-        animate()
-            .alpha(0.0F)
-            .setDuration(200)
-            .withEndAction {
-                removeView(blurView)
-                blurView = null
+        animate().apply {
+            alpha(0.0F)
+            duration = 250
+            withEndAction {
+                blurView?.let {
+                    removeView(blurView)
+                    blurView = null
+                }
                 if (createAsWindow) {
-                    getWindowManager(context).removeViewImmediate(this)
+                    getWindowManager(context).removeViewImmediate(this@ArrowPanel)
                 } else {
-                    getRootViewGroup()?.removeView(this)
+                    getRootViewGroup()?.removeView(this@ArrowPanel)
                 }
             }
+        }.start()
     }
 
     private fun showArrowLayout() {
@@ -402,11 +406,15 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         }
     }
 
-    open fun setAnimator(animator: Animator?) {
+    open fun setAnimator(animator: BaseAnimator?) {
         arrowContainer.animator = animator
     }
 
-    open fun getAnimator(): Animator? {
+    open fun setTouchAnimator(touchAnimator: TouchAnimator?) {
+        arrowContainer.touchAnimator = touchAnimator
+    }
+
+    open fun getAnimator(): BaseAnimator? {
         return arrowContainer.animator
     }
 
@@ -550,8 +558,17 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         }
     }
 
+    open fun setPivotToArrow(pivotToArrow: Boolean) {
+        arrowContainer.pivotToArrow = pivotToArrow
+    }
+
     open class Builder(context: Context) {
         private val arrowPanel: ArrowPanel = ArrowPanel(context)
+
+        open fun setPivotToArrow(pivotToArrow: Boolean): Builder {
+            arrowPanel.setPivotToArrow(pivotToArrow)
+            return this
+        }
 
         open fun setDim(dimColor: Int, @DimDef dimAmount: Float = 0.6F): Builder {
             arrowPanel.setDim(dimColor, dimAmount)
@@ -673,8 +690,13 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
             return this
         }
 
-        open fun setAnimator(animator: Animator?): Builder {
+        open fun setAnimator(animator: BaseAnimator?): Builder {
             arrowPanel.setAnimator(animator)
+            return this
+        }
+
+        open fun setTouchAnimator(touchAnimator: TouchAnimator?): Builder {
+            arrowPanel.setTouchAnimator(touchAnimator)
             return this
         }
 
@@ -702,7 +724,6 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
             arrowPanel.createAsWindow = asWindow
             return this
         }
-
 
         open fun setOnChildClickListener(
             onChildClickListener: ArrowInterface.OnChildClickListener?,

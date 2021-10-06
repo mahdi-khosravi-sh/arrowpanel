@@ -5,58 +5,30 @@ import android.view.View
 import android.view.animation.OvershootInterpolator
 import androidx.annotation.IntDef
 
-open class SlideAnimator : Animator {
+open class SlideAnimator : BaseAnimator {
     @SlideEdgeDef
     var slideEdge: Int
-    var slideTranslation: Float = 25.0F
-    var hideReverse: Boolean = true
-
-    init {
-        setInterpolator(OvershootInterpolator())
-        setDuration(350)
-    }
+    var slideTranslation: Float = -25.0F
+    var hideReverse: Boolean = false
 
     constructor() {
-        slideEdge = Gravity.TOP
+        slideEdge = Gravity.BOTTOM
     }
 
     constructor(@SlideEdgeDef slideEdge: Int) {
         this.slideEdge = slideEdge
     }
 
-    override fun initBeforeShow(view: View) {
-        super.initBeforeShow(view)
-        view.alpha = 0.0F
+    init {
+        interpolator = OvershootInterpolator()
+        duration = 350
     }
 
-    private fun checkLayoutDirection(view: View) {
-        when (slideEdge) {
-            Gravity.START -> {
-                slideEdge =
-                    if (view.rootView.layoutDirection == View.LAYOUT_DIRECTION_LTR) {
-                        Gravity.LEFT
-                    } else {
-                        Gravity.RIGHT
-                    }
-            }
-            Gravity.END -> {
-                slideEdge =
-                    if (view.rootView.layoutDirection == View.LAYOUT_DIRECTION_LTR) {
-                        Gravity.RIGHT
-                    } else {
-                        Gravity.LEFT
-                    }
-            }
-        }
-    }
-
-    override fun animateShow(view: View) {
+    override fun animateShowImpl(view: View) {
         val x = view.x
         val y = view.y
 
-        checkLayoutDirection(view)
-
-        when (slideEdge) {
+        when (getExplicitEdge(view)) {
             Gravity.TOP -> {
                 view.translationY = y - slideTranslation
             }
@@ -70,26 +42,22 @@ open class SlideAnimator : Animator {
                 view.translationX = x - slideTranslation
             }
         }
-
-        view.animate()
-            .alpha(1.0F)
-            .translationX(x)
-            .translationY(y)
-            .setUpdateListener {
-                view.invalidate()
-            }
-            .setDuration(getDuration())
-            .interpolator = getInterpolator()
+        view.animate().apply {
+            alpha(1.0F)
+            translationX(x)
+            translationY(y)
+            setUpdateListener { view.invalidate() }
+            duration = this@SlideAnimator.duration
+            interpolator = this@SlideAnimator.interpolator
+        }.start()
     }
 
-    override fun animateHide(view: View) {
+    override fun animateHideImpl(view: View) {
         var x = view.x
         var y = view.y
 
-        checkLayoutDirection(view)
-
         if (hideReverse) {
-            when (slideEdge) {
+            when (getExplicitEdge(view)) {
                 Gravity.TOP -> {
                     y += slideTranslation
                 }
@@ -104,7 +72,7 @@ open class SlideAnimator : Animator {
                 }
             }
         } else {
-            when (slideEdge) {
+            when (getExplicitEdge(view)) {
                 Gravity.TOP -> {
                     y -= slideTranslation
                 }
@@ -119,14 +87,36 @@ open class SlideAnimator : Animator {
                 }
             }
         }
+        super.animateHideImpl(view)
+        view.animate().apply {
+            translationX(x)
+            translationY(y)
+            setUpdateListener { view.invalidate() }
+            duration = this@SlideAnimator.duration
+            interpolator = this@SlideAnimator.interpolator
+        }.start()
+    }
 
-        view.animate()
-            .alpha(0.0F)
-            .translationX(x)
-            .translationY(y)
-            .setUpdateListener { view.invalidate() }
-            .setDuration(getDuration())
-            .interpolator = getInterpolator()
+    private fun getExplicitEdge(view: View): Int {
+        return when (slideEdge) {
+            Gravity.START -> {
+                if (view.rootView.layoutDirection == View.LAYOUT_DIRECTION_LTR) {
+                    Gravity.LEFT
+                } else {
+                    Gravity.RIGHT
+                }
+            }
+            Gravity.END -> {
+                if (view.rootView.layoutDirection == View.LAYOUT_DIRECTION_LTR) {
+                    Gravity.RIGHT
+                } else {
+                    Gravity.LEFT
+                }
+            }
+            else -> {
+                slideEdge
+            }
+        }
     }
 
     @kotlin.annotation.Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)

@@ -3,7 +3,6 @@ package com.mahdikh.vision.arrowpanel.widget
 import android.content.Context
 import android.graphics.Color
 import android.view.View
-import android.view.animation.OvershootInterpolator
 import android.widget.TextView
 import com.mahdikh.vision.arrowpanel.R
 import com.mahdikh.vision.arrowpanel.animator.ScaleAnimator
@@ -18,16 +17,8 @@ class ArrowTip private constructor(context: Context) : ArrowPanel(context) {
         val view = setContentView(R.layout.arrowtip_simple_text)
         textView = view.findViewById(R.id.textView)
 
-        setAnimator(
-            ScaleAnimator()
-                .setInterpolator(OvershootInterpolator())
-                .setDuration(350)
-                .setTouchAnimator(
-                    ScaleTouchAnimator()
-                        .setDuration(250)
-                        .setInterpolator(OvershootInterpolator())
-                )
-        )
+        setAnimator(ScaleAnimator().apply { duration = 350 })
+        setTouchAnimator(ScaleTouchAnimator())
     }
 
     fun setText(text: String) {

@@ -16,13 +16,20 @@ import androidx.annotation.ColorInt
 import androidx.annotation.IntDef
 import androidx.core.view.setPadding
 import com.mahdikh.vision.arrowpanel.R
-import com.mahdikh.vision.arrowpanel.animator.Animator
+import com.mahdikh.vision.arrowpanel.animator.BaseAnimator
+import com.mahdikh.vision.arrowpanel.touchanimator.TouchAnimator
 
 open class ArrowContainer(context: Context) : FrameLayout(context) {
     val strokePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     val paint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val arrowPath: Path = Path()
     private val path: Path = Path()
+
+    open var animator: BaseAnimator? = null
+    open var touchAnimator: TouchAnimator? = null
+
+    open var pivotToArrow = true
+
     private val targetLocation: IntArray = IntArray(2)
     private var firstYAxis: Float = 0.0F
     private var firstXAxis: Float = 0.0F
@@ -44,14 +51,6 @@ open class ArrowContainer(context: Context) : FrameLayout(context) {
         set(value) {
             field = value
             invalidate()
-        }
-
-    open var animator: Animator? = null
-        set(value) {
-            field = value
-            if (!isAttachedToWindow) {
-                field?.initBeforeShow(this)
-            }
         }
 
     init {
@@ -129,14 +128,9 @@ open class ArrowContainer(context: Context) : FrameLayout(context) {
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         val action = ev.action
         if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP) {
-            animator?.animateOnTouch(this, action)
+            touchAnimator?.animateTouch(this, action)
         }
         return super.dispatchTouchEvent(ev)
-    }
-
-    override fun draw(canvas: Canvas) {
-        animator?.draw(canvas)
-        super.draw(canvas)
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -332,8 +326,10 @@ open class ArrowContainer(context: Context) : FrameLayout(context) {
                 }
             }
 
-            pivotX = rightPointX - arrowWidth / 2
-            pivotY = centerPointY
+            if (pivotToArrow) {
+                pivotX = rightPointX - arrowWidth / 2
+                pivotY = centerPointY
+            }
         } else {
             var centerPointY = targetLocation[1] - y + targetHeight / 2F
             if (centerPointY < 0) {
@@ -371,8 +367,10 @@ open class ArrowContainer(context: Context) : FrameLayout(context) {
             arrowPath.lineTo(centerPointX, centerPointY)
             arrowPath.lineTo(pointX, bottomPointY)
 
-            pivotX = pointX
-            pivotY = centerPointY
+            if (pivotToArrow) {
+                pivotX = pointX
+                pivotY = centerPointY
+            }
         }
         arrowPath.close()
     }
