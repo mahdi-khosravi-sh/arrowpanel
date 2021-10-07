@@ -10,6 +10,7 @@ import android.graphics.Path
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.CallSuper
 import androidx.annotation.ColorInt
@@ -67,11 +68,15 @@ open class ArrowContainer(context: Context) : FrameLayout(context) {
         strokePaint.strokeJoin = Paint.Join.ROUND
         strokePaint.color = Color.WHITE
 
-        layoutParams = LayoutParams(
-            LayoutParams.WRAP_CONTENT,
-            LayoutParams.WRAP_CONTENT
-        )
         adjustAttrsFromTheme(context)
+    }
+
+    override fun setLayoutParams(params: ViewGroup.LayoutParams?) {
+        params?.apply {
+            width = LayoutParams.WRAP_CONTENT
+            height = LayoutParams.WRAP_CONTENT
+        }
+        super.setLayoutParams(params)
     }
 
     private fun adjustAttrsFromTheme(context: Context) {

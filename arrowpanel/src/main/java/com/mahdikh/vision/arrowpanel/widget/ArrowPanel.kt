@@ -34,9 +34,10 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
     open var blurRadius: Float = 5.0F
     open var arrowMargin: Int = 5
     open var drawTargetView: Boolean = true
-    open var createAsWindow = false
     private var mCanceled = false
     private var mDismissed = false
+
+    open var type: Int = TYPE_DECOR
 
     open var cancelable: Boolean = true
     open var cancelableOnTouchOutside: Boolean = true
@@ -76,7 +77,7 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
     }
 
     open fun show() {
-        if (createAsWindow) {
+        if (type == TYPE_WINDOW) {
             addAsWindow()
             post {
                 showArrowLayout()
@@ -125,7 +126,7 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
                     removeView(blurView)
                     blurView = null
                 }
-                if (createAsWindow && isAttachedToWindow) {
+                if (type == TYPE_WINDOW && isAttachedToWindow) {
                     getWindowManager(context).removeViewImmediate(this@ArrowPanel)
                 } else {
                     getRootViewGroup()?.removeView(this@ArrowPanel)
@@ -138,7 +139,7 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         adjustArrowLayoutLocation()
         animate().alpha(1.0F).duration = 150
 
-        if (createAsWindow) {
+        if (type == TYPE_WINDOW) {
             arrowContainer.requestLayout()
         }
 
@@ -174,7 +175,7 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         }
 
         targetView?.let { target ->
-            if (createAsWindow) {
+            if (type == TYPE_WINDOW) {
                 target.getLocationOnScreen(targetLocation)
             } else {
                 target.getLocationInWindow(targetLocation)
@@ -340,14 +341,10 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
 
     private fun addInRootViewGroup() {
         getRootViewGroup()?.let { rootView ->
-            layoutParams = LayoutParams(
-                WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.MATCH_PARENT
-            )
             addView(arrowContainer)
             rootView.addView(this)
         } ?: kotlin.run {
-            createAsWindow = true
+            type = TYPE_WINDOW
             addAsWindow()
         }
     }
@@ -398,10 +395,6 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         blurView = BlurView(context).also {
             it.addNoBlurView(this)
             it.setOverlapView(this)
-            it.layoutParams = LayoutParams(
-                LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT
-            )
             if (drawTargetView) {
                 targetView?.let { target ->
                     it.addNoBlurView(target)
@@ -504,7 +497,8 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
     open fun setDrawBlurEffect(drawBlurEffect: Boolean) {
         if (drawBlurEffect) {
             createBlurView()
-        } else {
+        } else if (blurView != null) {
+            removeView(blurView)
             blurView = null
         }
     }
@@ -580,96 +574,154 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         arrowContainer.pivotToArrow = pivotToArrow
     }
 
-    open class Builder(context: Context) {
-        private val arrowPanel: ArrowPanel = ArrowPanel(context)
+    class Builder(context: Context) {
+        private val panelParams = PanelParams()
+        private val arrowPanel = ArrowPanel(context)
 
-        open fun setPivotToArrow(pivotToArrow: Boolean): Builder {
-            arrowPanel.setPivotToArrow(pivotToArrow)
+        fun setContentView(view: View): Builder {
+            panelParams.mView = view
+            panelParams.mViewLayoutResId = 0
             return this
         }
 
-        open fun setDim(dimColor: Int, @DimDef dimAmount: Float = 0.6F): Builder {
-            arrowPanel.setDim(dimColor, dimAmount)
+        fun setContentView(@LayoutRes layoutId: Int): Builder {
+            panelParams.mViewLayoutResId = layoutId
+            panelParams.mView = null
             return this
         }
 
-        open fun setDrawTargetView(drawTargetView: Boolean): Builder {
+        fun setType(type: Int): Builder {
+            arrowPanel.type = type
+            return this
+        }
+
+        fun setTargetView(targetView: View?): Builder {
+            panelParams.targetView = targetView
+            return this
+        }
+
+        fun setDrawTargetView(drawTargetView: Boolean): Builder {
             arrowPanel.drawTargetView = drawTargetView
             return this
         }
 
-        open fun setDrawBlurEffect(drawBlurEffect: Boolean): Builder {
-            arrowPanel.setDrawBlurEffect(drawBlurEffect)
+        fun setLocation(x: Int, y: Int): Builder {
+            arrowPanel.setLocation(x, y)
             return this
         }
 
-        open fun setBlurQuality(quality: Int): Builder {
-            arrowPanel.blurQuality = quality
+        fun setLocation(motionEvent: MotionEvent): Builder {
+            arrowPanel.setLocation(motionEvent)
             return this
         }
 
-        open fun setBlurRadius(radius: Float): Builder {
-            arrowPanel.blurRadius = radius
+        fun setOrientation(orientation: Int): Builder {
+            arrowPanel.orientation = orientation
             return this
         }
 
-        open fun setStrokeWidth(strokeWidth: Float): Builder {
-            arrowPanel.setStrokeWidth(strokeWidth)
+        fun setAnimator(animator: BaseAnimator?): Builder {
+            arrowPanel.setAnimator(animator)
             return this
         }
 
-        open fun setStrokeColor(@ColorInt strokeColor: Int): Builder {
-            arrowPanel.setStrokeColor(strokeColor)
+        fun setTouchAnimator(touchAnimator: TouchAnimator?): Builder {
+            arrowPanel.setTouchAnimator(touchAnimator)
             return this
         }
 
-        open fun setFillColor(@ColorInt fillColor: Int): Builder {
-            arrowPanel.setFillColor(fillColor)
+        fun setShadow(radius: Float, dx: Float, dy: Float, shadowColor: Int): Builder {
+            arrowPanel.setShadow(radius, dx, dy, shadowColor)
             return this
         }
 
-        open fun setCornerRadius(cornerRadius: Float): Builder {
+        fun clearShadow(): Builder {
+            arrowPanel.clearShadow()
+            return this
+        }
+
+        fun setCornerRadius(cornerRadius: Float): Builder {
             arrowPanel.setCornerRadius(cornerRadius)
             return this
         }
 
-        open fun setArrowWidth(arrowWidth: Int): Builder {
-            arrowPanel.setArrowWidth(arrowWidth)
+        fun setStrokeWidth(strokeWidth: Float): Builder {
+            arrowPanel.setStrokeWidth(strokeWidth)
             return this
         }
 
-        open fun setArrowHeight(arrowHeight: Int): Builder {
-            arrowPanel.setArrowHeight(arrowHeight)
+        fun setStrokeColor(@ColorInt strokeColor: Int): Builder {
+            arrowPanel.setStrokeColor(strokeColor)
             return this
         }
 
-        open fun setArrowMargin(margin: Int): Builder {
+        fun setFillColor(@ColorInt fillColor: Int): Builder {
+            arrowPanel.setFillColor(fillColor)
+            return this
+        }
+
+        fun setDrawArrow(drawArrow: Boolean): Builder {
+            arrowPanel.setDrawArrow(drawArrow)
+            return this
+        }
+
+        fun setArrowMargin(margin: Int): Builder {
             arrowPanel.arrowMargin = margin
             return this
         }
 
-        open fun setContentView(view: View): Builder {
-            arrowPanel.setContentView(view)
+        fun setArrowWidth(arrowWidth: Int): Builder {
+            arrowPanel.setArrowWidth(arrowWidth)
             return this
         }
 
-        open fun setContentView(@LayoutRes layoutId: Int): Builder {
-            arrowPanel.setContentView(layoutId)
+        fun setArrowHeight(arrowHeight: Int): Builder {
+            arrowPanel.setArrowHeight(arrowHeight)
             return this
         }
 
-        open fun setCancelable(cancel: Boolean): Builder {
+        fun setPivotToArrow(pivotToArrow: Boolean): Builder {
+            arrowPanel.setPivotToArrow(pivotToArrow)
+            return this
+        }
+
+        fun setDim(dimColor: Int, @DimDef dimAmount: Float = 0.6F): Builder {
+            arrowPanel.setDim(dimColor, dimAmount)
+            return this
+        }
+
+        fun setDrawBlurEffect(blurEffect: Boolean): Builder {
+            panelParams.drawBlurEffect = blurEffect
+            return this
+        }
+
+        fun setBlurQuality(blurQuality: Int): Builder {
+            arrowPanel.blurQuality = blurQuality
+            return this
+        }
+
+        fun setBlurRadius(blurRadius: Float): Builder {
+            arrowPanel.blurRadius = blurRadius
+            return this
+        }
+
+        fun setCancelable(cancel: Boolean): Builder {
             arrowPanel.cancelable = cancel
             return this
         }
 
-        open fun setCancelableOnTouchOutside(cancel: Boolean): Builder {
+        fun setCancelableOnTouchOutside(cancel: Boolean): Builder {
             arrowPanel.cancelableOnTouchOutside = cancel
             return this
         }
 
-        open fun setInteractionWhenTouchOutside(interaction: Boolean): Builder {
+        fun setInteractionWhenTouchOutside(interaction: Boolean): Builder {
             arrowPanel.setInteractionTouchOutside(interaction)
+            return this
+        }
+
+        fun setTimeOutDuration(duration: Long): Builder {
+            arrowPanel.timeOutDuration = duration
             return this
         }
 
@@ -688,94 +740,42 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
             return this
         }
 
-        fun clearShadow(): Builder {
-            arrowPanel.clearShadow()
-            return this
-        }
-
-        fun setShadow(radius: Float, dx: Float, dy: Float, shadowColor: Int): Builder {
-            arrowPanel.setShadow(radius, dx, dy, shadowColor)
-            return this
-        }
-
-        fun setTimeOutDuration(duration: Long): Builder {
-            arrowPanel.timeOutDuration = duration
-            return this
-        }
-
-        open fun setOrientation(orientation: Int): Builder {
-            arrowPanel.orientation = orientation
-            return this
-        }
-
-        open fun setAnimator(animator: BaseAnimator?): Builder {
-            arrowPanel.setAnimator(animator)
-            return this
-        }
-
-        open fun setTouchAnimator(touchAnimator: TouchAnimator?): Builder {
-            arrowPanel.setTouchAnimator(touchAnimator)
-            return this
-        }
-
-        open fun setDrawArrow(drawArrow: Boolean): Builder {
-            arrowPanel.setDrawArrow(drawArrow)
-            return this
-        }
-
-        open fun setTargetView(targetView: View?): Builder {
-            arrowPanel.targetView = targetView
-            return this
-        }
-
-        open fun setLocation(x: Int, y: Int): Builder {
-            arrowPanel.setLocation(x, y)
-            return this
-        }
-
-        open fun setLocation(motionEvent: MotionEvent): Builder {
-            arrowPanel.setLocation(motionEvent)
-            return this
-        }
-
-        open fun setCreateAsWindow(asWindow: Boolean): Builder {
-            arrowPanel.createAsWindow = asWindow
-            return this
-        }
-
-        open fun setOnChildClickListener(
+        fun setOnChildClickListener(
             onChildClickListener: ArrowInterface.OnChildClickListener?,
             vararg ids: Int
         ): Builder {
-            arrowPanel.setOnChildClickListener(onChildClickListener, *ids)
+            panelParams.onChildClickListener = onChildClickListener
+            panelParams.clickIds = ids
             return this
         }
 
-        open fun setOnChildLongClickListener(
+        fun setOnChildLongClickListener(
             onChildLongClickListener: ArrowInterface.OnChildLongClickListener?,
             vararg ids: Int
         ): Builder {
-            arrowPanel.setOnChildLongClickListener(onChildLongClickListener, *ids)
+            panelParams.onChildLongClickListener = onChildLongClickListener
+            panelParams.longClickIds = ids
             return this
         }
 
-        open fun build(): ArrowPanel {
+        fun build(): ArrowPanel {
+            panelParams.apply(arrowPanel)
             return arrowPanel
         }
 
-        open fun show(): ArrowPanel {
+        fun show(): ArrowPanel {
             val p = build()
             p.show()
             return p
         }
 
-        open fun show(targetView: View): ArrowPanel {
+        fun show(targetView: View): ArrowPanel {
             val p = build()
             p.show(targetView)
             return p
         }
 
-        open fun show(motionEvent: MotionEvent): ArrowPanel {
+        fun show(motionEvent: MotionEvent): ArrowPanel {
             val p = build()
             p.show(motionEvent)
             return p
@@ -783,6 +783,9 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
     }
 
     companion object {
+        const val TYPE_DECOR = 0
+        const val TYPE_WINDOW = 1
+
         const val DURATION_INFINITE: Long = -1
         const val DURATION_SHORT: Long = 4000
         const val DURATION_MEDIUM: Long = 5500
