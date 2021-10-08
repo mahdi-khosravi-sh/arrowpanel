@@ -13,8 +13,7 @@ class ScaleTouchAnimator : TouchAnimator() {
 
     override fun animateTouchDownImpl(view: View) {
         view.animate().apply {
-            scaleX(toScale)
-            scaleY(toScale)
+            scaleX(toScale).scaleY(toScale)
             interpolator = this@ScaleTouchAnimator.interpolator
             duration = this@ScaleTouchAnimator.duration
         }.start()
@@ -22,8 +21,7 @@ class ScaleTouchAnimator : TouchAnimator() {
 
     override fun animateTouchUpImpl(view: View) {
         view.animate().apply {
-            scaleX(1.0F)
-            scaleY(1.0F)
+            scaleX(1.0F).scaleY(1.0F)
             interpolator = this@ScaleTouchAnimator.interpolator
             duration = this@ScaleTouchAnimator.duration
         }.start()
