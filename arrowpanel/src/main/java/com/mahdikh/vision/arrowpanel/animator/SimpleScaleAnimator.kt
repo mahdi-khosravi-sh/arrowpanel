@@ -14,8 +14,7 @@ open class SimpleScaleAnimator : FadeAnimator() {
     override fun animateShowImpl(v: View) {
         fadeIn(v, duration / 2)
         v.animate().apply {
-            scaleX(1.0F)
-            scaleY(1.0F)
+            scaleX(1.0F).scaleY(1.0F)
             duration = this@SimpleScaleAnimator.duration
             interpolator = this@SimpleScaleAnimator.interpolator
         }.start()

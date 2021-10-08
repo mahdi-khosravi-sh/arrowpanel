@@ -6,8 +6,7 @@ open class ScaleAnimator : SimpleScaleAnimator() {
     override fun animateHideImpl(v: View) {
         super.animateHideImpl(v)
         v.animate().apply {
-            scaleX(fromScale)
-            scaleY(fromScale)
+            scaleX(fromScale).scaleY(fromScale)
             duration = this@ScaleAnimator.duration
             interpolator = this@ScaleAnimator.interpolator
         }.start()

@@ -45,8 +45,8 @@ open class SlideAnimator : FadeAnimator {
         fadeIn(v)
         v.animate().apply {
             translationX(x)
-            translationY(y)
-            setUpdateListener { v.invalidate() }
+                .translationY(y)
+                .setUpdateListener { v.invalidate() }
             duration = this@SlideAnimator.duration
             interpolator = this@SlideAnimator.interpolator
         }.start()
@@ -90,8 +90,8 @@ open class SlideAnimator : FadeAnimator {
         fadeOut(v)
         v.animate().apply {
             translationX(x)
-            translationY(y)
-            setUpdateListener { v.invalidate() }
+                .translationY(y)
+                .setUpdateListener { v.invalidate() }
             duration = this@SlideAnimator.duration
             interpolator = this@SlideAnimator.interpolator
         }.start()

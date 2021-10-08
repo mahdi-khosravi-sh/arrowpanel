@@ -10,7 +10,6 @@ open class FlipHorizontallyAnimator : FadeAnimator() {
 
     override fun animateShowImpl(v: View) {
         fadeIn(v, duration / 2)
-
         v.animate().apply {
             rotationY(0.0F)
             interpolator = this@FlipHorizontallyAnimator.interpolator

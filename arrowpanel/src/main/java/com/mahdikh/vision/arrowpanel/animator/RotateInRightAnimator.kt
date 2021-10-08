@@ -15,10 +15,10 @@ class RotateInRightAnimator : RotationAnimator() {
 
     override fun animateShowImpl(v: View) {
         super.animateShowImpl(v)
-        v.animate()
-            .translationX(v.translationX + 100)
-            .setInterpolator(interpolator)
-            .setDuration(duration)
-            .start()
+        v.animate().apply {
+            translationX(v.translationX + 100)
+            interpolator = this@RotateInRightAnimator.interpolator
+            duration = this@RotateInRightAnimator.duration
+        }.start()
     }
 }
