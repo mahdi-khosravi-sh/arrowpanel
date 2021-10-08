@@ -24,18 +24,18 @@ open class FadeAnimator : BaseAnimator() {
     }
 
     protected open fun fadeIn(v: View, duration: Long) {
-        v.animate()
-            .alpha(1.0F)
-            .setInterpolator(null)
-            .setDuration(duration)
-            .start()
+        v.animate().apply {
+            alpha(1.0F)
+            interpolator = null
+            this.duration = duration
+        }.start()
     }
 
     protected open fun fadeOut(v: View, duration: Long) {
-        v.animate()
-            .alpha(0.0F)
-            .setInterpolator(null)
-            .setDuration(duration)
-            .start()
+        v.animate().apply {
+            alpha(0.0F)
+            interpolator = null
+            this.duration = duration
+        }.start()
     }
 }
