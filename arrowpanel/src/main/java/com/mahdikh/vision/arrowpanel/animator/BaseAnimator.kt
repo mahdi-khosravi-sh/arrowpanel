@@ -8,37 +8,23 @@ abstract class BaseAnimator {
     var interpolator: TimeInterpolator? = null
     var duration: Long = 250
 
-    protected open fun preAnimateShow(view: View) {
-        view.alpha = 0.0F
-    }
+    protected open fun preAnimateShow(v: View) {}
 
-    protected open fun preAnimateHide(view: View) {}
+    protected open fun preAnimateHide(v: View) {}
 
-    protected open fun animateShowImpl(view: View) {
-        view.animate()
-            .alpha(1.0F)
-            .setInterpolator(null)
-            .setDuration(duration / 2)
-            .start()
-    }
+    protected open fun animateShowImpl(v: View) {}
 
-    protected open fun animateHideImpl(view: View) {
-        view.animate()
-            .alpha(0.0F)
-            .setInterpolator(null)
-            .setDuration(duration)
-            .start()
+    protected open fun animateHideImpl(v: View) {}
+
+    @CallSuper
+    open fun animateShow(v: View) {
+        preAnimateShow(v)
+        animateShowImpl(v)
     }
 
     @CallSuper
-    open fun animateShow(view: View) {
-        preAnimateShow(view)
-        animateShowImpl(view)
-    }
-
-    @CallSuper
-    open fun animateHide(view: View) {
-        preAnimateHide(view)
-        animateHideImpl(view)
+    open fun animateHide(v: View) {
+        preAnimateHide(v)
+        animateHideImpl(v)
     }
 }

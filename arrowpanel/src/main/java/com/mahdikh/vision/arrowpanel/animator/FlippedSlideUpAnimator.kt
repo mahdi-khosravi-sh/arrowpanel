@@ -2,19 +2,18 @@ package com.mahdikh.vision.arrowpanel.animator
 
 import android.view.View
 
-class FlippedSlideUpAnimator : FlipHorizontallyAnimator() {
+open class FlippedSlideUpAnimator : FlipHorizontallyAnimator() {
     var translation = 100.0F
 
-    override fun preAnimateShow(view: View) {
-        super.preAnimateShow(view)
-        view.translationY = view.y + translation
+    override fun preAnimateShow(v: View) {
+        super.preAnimateShow(v)
+        v.translationY = v.y + translation
     }
 
-    override fun animateShowImpl(view: View) {
-        super.animateShowImpl(view)
-
-        view.animate().apply {
-            translationY(view.translationY - translation)
+    override fun animateShowImpl(v: View) {
+        super.animateShowImpl(v)
+        v.animate().apply {
+            translationY(v.translationY - translation)
             interpolator = this@FlippedSlideUpAnimator.interpolator
             duration = this@FlippedSlideUpAnimator.duration
         }.start()

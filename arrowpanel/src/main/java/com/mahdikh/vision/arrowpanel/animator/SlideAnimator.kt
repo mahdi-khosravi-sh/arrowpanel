@@ -5,7 +5,7 @@ import android.view.View
 import android.view.animation.OvershootInterpolator
 import androidx.annotation.IntDef
 
-open class SlideAnimator : BaseAnimator {
+open class SlideAnimator : FadeAnimator {
     @SlideEdgeDef
     var slideEdge: Int
     var slideTranslation: Float = -25.0F
@@ -24,40 +24,40 @@ open class SlideAnimator : BaseAnimator {
         duration = 350
     }
 
-    override fun animateShowImpl(view: View) {
-        val x = view.x
-        val y = view.y
+    override fun animateShowImpl(v: View) {
+        val x = v.x
+        val y = v.y
 
-        when (getExplicitEdge(view)) {
+        when (getExplicitEdge(v)) {
             Gravity.TOP -> {
-                view.translationY = y - slideTranslation
+                v.translationY = y - slideTranslation
             }
             Gravity.BOTTOM -> {
-                view.translationY = y + slideTranslation
+                v.translationY = y + slideTranslation
             }
             Gravity.RIGHT -> {
-                view.translationX = x + slideTranslation
+                v.translationX = x + slideTranslation
             }
             Gravity.LEFT -> {
-                view.translationX = x - slideTranslation
+                v.translationX = x - slideTranslation
             }
         }
-        view.animate().apply {
-            alpha(1.0F)
+        fadeIn(v)
+        v.animate().apply {
             translationX(x)
             translationY(y)
-            setUpdateListener { view.invalidate() }
+            setUpdateListener { v.invalidate() }
             duration = this@SlideAnimator.duration
             interpolator = this@SlideAnimator.interpolator
         }.start()
     }
 
-    override fun animateHideImpl(view: View) {
-        var x = view.x
-        var y = view.y
+    override fun animateHideImpl(v: View) {
+        var x = v.x
+        var y = v.y
 
         if (hideReverse) {
-            when (getExplicitEdge(view)) {
+            when (getExplicitEdge(v)) {
                 Gravity.TOP -> {
                     y += slideTranslation
                 }
@@ -72,7 +72,7 @@ open class SlideAnimator : BaseAnimator {
                 }
             }
         } else {
-            when (getExplicitEdge(view)) {
+            when (getExplicitEdge(v)) {
                 Gravity.TOP -> {
                     y -= slideTranslation
                 }
@@ -87,11 +87,11 @@ open class SlideAnimator : BaseAnimator {
                 }
             }
         }
-        super.animateHideImpl(view)
-        view.animate().apply {
+        fadeOut(v)
+        v.animate().apply {
             translationX(x)
             translationY(y)
-            setUpdateListener { view.invalidate() }
+            setUpdateListener { v.invalidate() }
             duration = this@SlideAnimator.duration
             interpolator = this@SlideAnimator.interpolator
         }.start()

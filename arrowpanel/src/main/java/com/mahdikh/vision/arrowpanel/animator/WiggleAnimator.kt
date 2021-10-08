@@ -5,13 +5,15 @@ import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.view.View
 
-class WiggleAnimator : BaseAnimator() {
-    override fun preAnimateShow(view: View) {
-        view.pivotX = view.measuredWidth / 2F
-        view.pivotY = view.measuredHeight / 2F
+open class WiggleAnimator : FadeAnimator() {
+    override fun preAnimateShow(v: View) {
+        super.preAnimateShow(v)
+        v.pivotX = v.measuredWidth / 2F
+        v.pivotY = v.measuredHeight / 2F
     }
 
-    override fun animateShowImpl(view: View) {
+    override fun animateShowImpl(v: View) {
+        fadeIn(v, duration / 2)
         val pRotation = PropertyValuesHolder.ofKeyframe(
             "rotation",
             Keyframe.ofFloat(0.0F, -3.0F),
@@ -21,7 +23,7 @@ class WiggleAnimator : BaseAnimator() {
             Keyframe.ofFloat(0.8F, -1.0F),
             Keyframe.ofFloat(1.0F, 0.0F)
         )
-        ObjectAnimator.ofPropertyValuesHolder(view, pRotation).apply {
+        ObjectAnimator.ofPropertyValuesHolder(v, pRotation).apply {
             duration = this@WiggleAnimator.duration
             interpolator = this@WiggleAnimator.interpolator
         }.start()

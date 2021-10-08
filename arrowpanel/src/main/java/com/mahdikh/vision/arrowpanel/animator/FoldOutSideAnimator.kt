@@ -4,7 +4,7 @@ import android.animation.TimeInterpolator
 import android.view.View
 import android.view.animation.OvershootInterpolator
 
-class FoldOutSideAnimator : BaseAnimator {
+open class FoldOutSideAnimator : FadeAnimator {
     constructor() : super() {
         interpolator = OvershootInterpolator()
     }
@@ -13,16 +13,15 @@ class FoldOutSideAnimator : BaseAnimator {
         this.interpolator = interpolator
     }
 
-    override fun preAnimateShow(view: View) {
-        super.preAnimateShow(view)
-        view.pivotX = view.measuredWidth / 2F
-        view.scaleX = 0.1F
+    override fun preAnimateShow(v: View) {
+        super.preAnimateShow(v)
+        v.pivotX = v.measuredWidth / 2F
+        v.scaleX = 0.1F
     }
 
-    override fun animateShowImpl(view: View) {
-        super.animateShowImpl(view)
-
-        view.animate().apply {
+    override fun animateShowImpl(v: View) {
+        fadeIn(v, duration / 2)
+        v.animate().apply {
             scaleX(1.0F)
             interpolator = this@FoldOutSideAnimator.interpolator
             duration = this@FoldOutSideAnimator.duration
