@@ -23,11 +23,12 @@ import androidx.fragment.app.FragmentActivity
 import com.mahdikh.vision.arrowpanel.animator.BaseAnimator
 import com.mahdikh.vision.arrowpanel.touchanimator.TouchAnimator
 
-open class ArrowPanel constructor(context: Context) : FrameLayout(context), ArrowInterface {
+open class ArrowPanel constructor(context: Context) : FrameLayout(context),
+    PanelInterface {
     private val targetLocation: IntArray = IntArray(2)
     private var blurView: BlurView? = null
     open var targetView: View? = null
-    var arrowContainer: ArrowContainer
+    var arrowLayout: ArrowLayout
         private set
 
     open var blurQuality: Int = 10
@@ -57,9 +58,9 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
             field = value
         }
 
-    private var onShowListener: ArrowInterface.OnShowListener? = null
-    private var onDismissListener: ArrowInterface.OnDismissListener? = null
-    private var onCancelListener: ArrowInterface.OnCancelListener? = null
+    private var onShowListener: PanelInterface.OnShowListener? = null
+    private var onDismissListener: PanelInterface.OnDismissListener? = null
+    private var onCancelListener: PanelInterface.OnCancelListener? = null
     private var childClickListener: OnClickListener? = null
     private var childLongClickListener: OnLongClickListener? = null
     private val dismissRunnable = Runnable { dismiss() }
@@ -71,7 +72,7 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         isFocusableInTouchMode = true
         clipChildren = false
         fitsSystemWindows = false
-        arrowContainer = ArrowContainer(context)
+        arrowLayout = ArrowLayout(context)
         super.setLayoutDirection(LAYOUT_DIRECTION_LTR)
         super.setWillNotDraw(false)
     }
@@ -102,7 +103,7 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
 
     override fun dismiss() {
         if (!mDismissed) {
-            arrowContainer.hide()
+            arrowLayout.hide()
             removeView()
             mDismissed = true
             onDismissListener?.onDismiss(this)
@@ -140,10 +141,10 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         animate().alpha(1.0F).duration = 150
 
         if (type == TYPE_WINDOW) {
-            arrowContainer.requestLayout()
+            arrowLayout.requestLayout()
         }
 
-        arrowContainer.show()
+        arrowLayout.show()
         onShowListener?.onShow(this)
 
         blurView?.let {
@@ -164,8 +165,8 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         val pWidth = rootView.width
         val pHeight = rootView.height
 
-        var arrowLayoutWidth = arrowContainer.measuredWidth
-        var arrowLayoutHeight = arrowContainer.measuredHeight
+        var arrowLayoutWidth = arrowLayout.measuredWidth
+        var arrowLayoutHeight = arrowLayout.measuredHeight
 
         if (arrowLayoutHeight > pHeight) {
             arrowLayoutHeight = pHeight
@@ -180,7 +181,7 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
             } else {
                 target.getLocationInWindow(targetLocation)
             }
-            arrowContainer.targetView = target
+            arrowLayout.targetView = target
 
             var y: Float
             var x: Float
@@ -241,13 +242,13 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
             if (x < 0) {
                 x = 0.0F + arrowMargin
             } else if (x + arrowLayoutWidth > pWidth) {
-                x = (pWidth - arrowContainer.measuredWidth - arrowMargin).toFloat()
+                x = (pWidth - arrowLayout.measuredWidth - arrowMargin).toFloat()
             }
             if (x < 0) {
                 x = 0.0F + arrowMargin
             }
-            arrowContainer.y = y
-            arrowContainer.x = x
+            arrowLayout.y = y
+            arrowLayout.x = x
         } ?: kotlin.run {
             var y: Float
             var x: Float
@@ -312,15 +313,15 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
             if (x < 0) {
                 x = 0.0F + arrowMargin
             } else if (x + arrowLayoutWidth > pWidth) {
-                x = (pWidth - arrowContainer.measuredWidth - arrowMargin).toFloat()
+                x = (pWidth - arrowLayout.measuredWidth - arrowMargin).toFloat()
             }
             if (x < 0) {
                 x = 0.0F + arrowMargin
             }
-            arrowContainer.y = y
-            arrowContainer.x = x
+            arrowLayout.y = y
+            arrowLayout.x = x
         }
-        arrowContainer.setTargetLocation(targetLocation[0], targetLocation[1])
+        arrowLayout.setTargetLocation(targetLocation[0], targetLocation[1])
     }
 
     private fun addAsWindow() {
@@ -335,13 +336,13 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
             PixelFormat.TRANSLUCENT
         )
         params.gravity = Gravity.LEFT or Gravity.TOP
-        addView(arrowContainer)
+        addView(arrowLayout)
         manager.addView(this, params)
     }
 
     private fun addInRootViewGroup() {
         getRootViewGroup()?.let { rootView ->
-            addView(arrowContainer)
+            addView(arrowLayout)
             rootView.addView(this)
         } ?: kotlin.run {
             type = TYPE_WINDOW
@@ -388,7 +389,7 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
     }
 
     override fun setLayoutDirection(layoutDirection: Int) {
-        arrowContainer.layoutDirection = layoutDirection
+        arrowLayout.layoutDirection = layoutDirection
     }
 
     protected open fun createBlurView() {
@@ -418,15 +419,15 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
     }
 
     open fun setAnimator(animator: BaseAnimator?) {
-        arrowContainer.animator = animator
+        arrowLayout.animator = animator
     }
 
     open fun setTouchAnimator(touchAnimator: TouchAnimator?) {
-        arrowContainer.touchAnimator = touchAnimator
+        arrowLayout.touchAnimator = touchAnimator
     }
 
     open fun getAnimator(): BaseAnimator? {
-        return arrowContainer.animator
+        return arrowLayout.animator
     }
 
     open fun isShowing(): Boolean {
@@ -438,21 +439,21 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
     }
 
     open fun setContentView(layoutId: Int): View {
-        return arrowContainer.inflateLayout(layoutId)
+        return arrowLayout.inflateLayout(layoutId)
     }
 
     open fun setContentView(view: View): View {
-        arrowContainer.removeAllViews()
-        arrowContainer.addView(view)
+        arrowLayout.removeAllViews()
+        arrowLayout.addView(view)
         return view
     }
 
     open fun getContentView(): View {
-        return arrowContainer
+        return arrowLayout
     }
 
     open fun findView(id: Int): View {
-        return arrowContainer.findViewById(id)
+        return arrowLayout.findViewById(id)
     }
 
     protected open fun getRootViewGroup(): ViewGroup? {
@@ -463,35 +464,35 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
     }
 
     open fun setStrokeWidth(strokeWidth: Float) {
-        arrowContainer.setStrokeWidth(strokeWidth)
+        arrowLayout.setStrokeWidth(strokeWidth)
     }
 
     open fun setStrokeColor(@ColorInt strokeColor: Int) {
-        arrowContainer.setStrokeColor(strokeColor)
+        arrowLayout.setStrokeColor(strokeColor)
     }
 
     open fun setFillColor(@ColorInt fillColor: Int) {
-        arrowContainer.setFillColor(fillColor)
+        arrowLayout.setFillColor(fillColor)
     }
 
     open fun setCornerRadius(cornerRadius: Float) {
-        arrowContainer.cornerRadius = cornerRadius
+        arrowLayout.cornerRadius = cornerRadius
     }
 
     open fun setArrowWidth(arrowWidth: Int) {
-        arrowContainer.arrowWidth = arrowWidth
+        arrowLayout.arrowWidth = arrowWidth
     }
 
     open fun setArrowHeight(arrowHeight: Int) {
-        arrowContainer.arrowHeight = arrowHeight
+        arrowLayout.arrowHeight = arrowHeight
     }
 
     open fun setShadow(radius: Float, dx: Float, dy: Float, shadowColor: Int) {
-        arrowContainer.setShadow(radius, dx, dy, shadowColor)
+        arrowLayout.setShadow(radius, dx, dy, shadowColor)
     }
 
     open fun clearShadow() {
-        arrowContainer.clearShadow()
+        arrowLayout.clearShadow()
     }
 
     open fun setDrawBlurEffect(drawBlurEffect: Boolean) {
@@ -515,7 +516,7 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
     }
 
     open fun setDrawArrow(drawArrow: Boolean) {
-        arrowContainer.drawArrow = drawArrow
+        arrowLayout.drawArrow = drawArrow
     }
 
     open fun setLocation(x: Int, y: Int) {
@@ -528,20 +529,20 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         targetLocation[1] = motionEvent.rawY.toInt()
     }
 
-    open fun setOnShowListener(onShowListener: ArrowInterface.OnShowListener?) {
+    open fun setOnShowListener(onShowListener: PanelInterface.OnShowListener?) {
         this.onShowListener = onShowListener
     }
 
-    open fun setOnDismissListener(onDismissListener: ArrowInterface.OnDismissListener?) {
+    open fun setOnDismissListener(onDismissListener: PanelInterface.OnDismissListener?) {
         this.onDismissListener = onDismissListener
     }
 
-    open fun setOnCancelListener(onCancelListener: ArrowInterface.OnCancelListener?) {
+    open fun setOnCancelListener(onCancelListener: PanelInterface.OnCancelListener?) {
         this.onCancelListener = onCancelListener
     }
 
     open fun setOnChildClickListener(
-        onChildClickListener: ArrowInterface.OnChildClickListener?,
+        onChildClickListener: PanelInterface.OnChildClickListener?,
         vararg ids: Int
     ) {
         childClickListener = if (onChildClickListener == null) {
@@ -551,12 +552,12 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         }
         val size = ids.size
         for (i in 0 until size) {
-            arrowContainer.findViewById<View>(ids[i]).setOnClickListener(childClickListener)
+            arrowLayout.findViewById<View>(ids[i]).setOnClickListener(childClickListener)
         }
     }
 
     open fun setOnChildLongClickListener(
-        onChildLongClickListener: ArrowInterface.OnChildLongClickListener?,
+        onChildLongClickListener: PanelInterface.OnChildLongClickListener?,
         vararg ids: Int
     ) {
         childLongClickListener = if (onChildLongClickListener == null) {
@@ -566,12 +567,12 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         }
         val size = ids.size
         for (i in 0 until size) {
-            arrowContainer.findViewById<View>(ids[i]).setOnLongClickListener(childLongClickListener)
+            arrowLayout.findViewById<View>(ids[i]).setOnLongClickListener(childLongClickListener)
         }
     }
 
     open fun setPivotToArrow(pivotToArrow: Boolean) {
-        arrowContainer.pivotToArrow = pivotToArrow
+        arrowLayout.pivotToArrow = pivotToArrow
     }
 
     class Builder(context: Context) {
@@ -725,23 +726,23 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
             return this
         }
 
-        fun setOnShowListener(onShowListener: ArrowInterface.OnShowListener?): Builder {
+        fun setOnShowListener(onShowListener: PanelInterface.OnShowListener?): Builder {
             arrowPanel.setOnShowListener(onShowListener)
             return this
         }
 
-        fun setOnDismissListener(onDismissListener: ArrowInterface.OnDismissListener?): Builder {
+        fun setOnDismissListener(onDismissListener: PanelInterface.OnDismissListener?): Builder {
             arrowPanel.setOnDismissListener(onDismissListener)
             return this
         }
 
-        fun setOnCancelListener(onCancelListener: ArrowInterface.OnCancelListener?): Builder {
+        fun setOnCancelListener(onCancelListener: PanelInterface.OnCancelListener?): Builder {
             arrowPanel.setOnCancelListener(onCancelListener)
             return this
         }
 
         fun setOnChildClickListener(
-            onChildClickListener: ArrowInterface.OnChildClickListener?,
+            onChildClickListener: PanelInterface.OnChildClickListener?,
             vararg ids: Int
         ): Builder {
             panelParams.onChildClickListener = onChildClickListener
@@ -750,7 +751,7 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Arro
         }
 
         fun setOnChildLongClickListener(
-            onChildLongClickListener: ArrowInterface.OnChildLongClickListener?,
+            onChildLongClickListener: PanelInterface.OnChildLongClickListener?,
             vararg ids: Int
         ): Builder {
             panelParams.onChildLongClickListener = onChildLongClickListener

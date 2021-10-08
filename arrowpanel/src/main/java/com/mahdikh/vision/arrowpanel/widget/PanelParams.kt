@@ -8,8 +8,8 @@ class PanelParams {
     var targetView: View? = null
     var drawBlurEffect = false
 
-    var onChildClickListener: ArrowInterface.OnChildClickListener? = null
-    var onChildLongClickListener: ArrowInterface.OnChildLongClickListener? = null
+    var onChildClickListener: PanelInterface.OnChildClickListener? = null
+    var onChildLongClickListener: PanelInterface.OnChildLongClickListener? = null
     var clickIds: IntArray? = null
     var longClickIds: IntArray? = null
 

@@ -20,7 +20,7 @@ import com.mahdikh.vision.arrowpanel.R
 import com.mahdikh.vision.arrowpanel.animator.BaseAnimator
 import com.mahdikh.vision.arrowpanel.touchanimator.TouchAnimator
 
-open class ArrowContainer(context: Context) : FrameLayout(context) {
+open class ArrowLayout(context: Context) : FrameLayout(context) {
     val strokePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     val paint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val arrowPath: Path = Path()
