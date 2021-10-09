@@ -80,7 +80,7 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
     }
 
     private fun adjustAttrsFromTheme(context: Context) {
-        val a: TypedArray = context.obtainStyledAttributes(R.styleable.ArrowContainer)
+        val a: TypedArray = context.obtainStyledAttributes(R.styleable.ArrowLayout)
         var shadowColor = Color.parseColor("#33000000")
         var shadowRadius = 5.0F
         var shadowDx = 0.0F
@@ -92,34 +92,34 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
         for (i in 0..indexCount) {
             index = a.getIndex(i)
             when (index) {
-                R.styleable.ArrowContainer_arrowTip_fillColor -> {
+                R.styleable.ArrowLayout_fillColor -> {
                     setFillColor(a.getColor(index, Color.WHITE))
                 }
-                R.styleable.ArrowContainer_arrowTip_strokeColor -> {
+                R.styleable.ArrowLayout_strokeColor -> {
                     setStrokeColor(a.getColor(index, Color.WHITE))
                 }
-                R.styleable.ArrowContainer_arrowTip_strokeWidth -> {
+                R.styleable.ArrowLayout_strokeWidth -> {
                     setStrokeWidth(a.getDimension(index, 0.0F))
                 }
-                R.styleable.ArrowContainer_arrowTip_arrowWidth -> {
+                R.styleable.ArrowLayout_arrowWidth -> {
                     arrowWidth = a.getDimensionPixelSize(index, 20)
                 }
-                R.styleable.ArrowContainer_arrowTip_arrowHeight -> {
+                R.styleable.ArrowLayout_arrowHeight -> {
                     arrowHeight = a.getDimensionPixelSize(index, 15)
                 }
-                R.styleable.ArrowContainer_arrowTip_shadowRadius -> {
+                R.styleable.ArrowLayout_shadowRadius -> {
                     shadowRadius = a.getDimension(index, 10.0F)
                 }
-                R.styleable.ArrowContainer_arrowTip_shadowDy -> {
+                R.styleable.ArrowLayout_shadowDy -> {
                     shadowDy = a.getFloat(index, 0.0F)
                 }
-                R.styleable.ArrowContainer_arrowTip_shadowDx -> {
+                R.styleable.ArrowLayout_shadowDx -> {
                     shadowDx = a.getFloat(index, 0.0f)
                 }
-                R.styleable.ArrowContainer_arrowTip_shadowColor -> {
+                R.styleable.ArrowLayout_shadowColor -> {
                     shadowColor = a.getColor(index, shadowColor)
                 }
-                R.styleable.ArrowContainer_arrowTip_cornerRadius -> {
+                R.styleable.ArrowLayout_cornerRadius -> {
                     cornerRadius = a.getDimension(index, 15.0F)
                 }
             }
