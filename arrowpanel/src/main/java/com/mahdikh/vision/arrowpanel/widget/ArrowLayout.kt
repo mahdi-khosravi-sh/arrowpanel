@@ -92,34 +92,34 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
         for (i in 0..indexCount) {
             index = a.getIndex(i)
             when (index) {
-                R.styleable.ArrowLayout_fillColor -> {
+                R.styleable.ArrowLayout_ap_fillColor -> {
                     setFillColor(a.getColor(index, Color.WHITE))
                 }
-                R.styleable.ArrowLayout_strokeColor -> {
+                R.styleable.ArrowLayout_ap_strokeColor -> {
                     setStrokeColor(a.getColor(index, Color.WHITE))
                 }
-                R.styleable.ArrowLayout_strokeWidth -> {
+                R.styleable.ArrowLayout_ap_strokeWidth -> {
                     setStrokeWidth(a.getDimension(index, 0.0F))
                 }
-                R.styleable.ArrowLayout_arrowWidth -> {
+                R.styleable.ArrowLayout_ap_arrowWidth -> {
                     arrowWidth = a.getDimensionPixelSize(index, 20)
                 }
-                R.styleable.ArrowLayout_arrowHeight -> {
+                R.styleable.ArrowLayout_ap_arrowHeight -> {
                     arrowHeight = a.getDimensionPixelSize(index, 15)
                 }
-                R.styleable.ArrowLayout_shadowRadius -> {
+                R.styleable.ArrowLayout_ap_shadowRadius -> {
                     shadowRadius = a.getDimension(index, 10.0F)
                 }
-                R.styleable.ArrowLayout_shadowDy -> {
+                R.styleable.ArrowLayout_ap_shadowDy -> {
                     shadowDy = a.getFloat(index, 0.0F)
                 }
-                R.styleable.ArrowLayout_shadowDx -> {
+                R.styleable.ArrowLayout_ap_shadowDx -> {
                     shadowDx = a.getFloat(index, 0.0f)
                 }
-                R.styleable.ArrowLayout_shadowColor -> {
+                R.styleable.ArrowLayout_ap_shadowColor -> {
                     shadowColor = a.getColor(index, shadowColor)
                 }
-                R.styleable.ArrowLayout_cornerRadius -> {
+                R.styleable.ArrowLayout_ap_cornerRadius -> {
                     cornerRadius = a.getDimension(index, 15.0F)
                 }
             }

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="ArrowLayout">
-        <attr name="fillColor" format="color" />
-        <attr name="strokeColor" format="color" />
-        <attr name="shadowColor" format="color" />
-        <attr name="arrowWidth" format="dimension" />
-        <attr name="arrowHeight" format="dimension" />
-        <attr name="shadowDx" format="float" />
-        <attr name="shadowDy" format="float" />
-        <attr name="strokeWidth" format="dimension" />
-        <attr name="shadowRadius" format="dimension" />
-        <attr name="cornerRadius" format="dimension" />
+        <attr name="ap_fillColor" format="color" />
+        <attr name="ap_strokeColor" format="color" />
+        <attr name="ap_shadowColor" format="color" />
+        <attr name="ap_arrowWidth" format="dimension" />
+        <attr name="ap_arrowHeight" format="dimension" />
+        <attr name="ap_shadowDx" format="float" />
+        <attr name="ap_shadowDy" format="float" />
+        <attr name="ap_strokeWidth" format="dimension" />
+        <attr name="ap_shadowRadius" format="dimension" />
+        <attr name="ap_cornerRadius" format="dimension" />
     </declare-styleable>
 </resources>
