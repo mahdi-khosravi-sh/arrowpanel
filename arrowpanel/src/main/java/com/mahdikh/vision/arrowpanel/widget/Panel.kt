@@ -1,6 +1,5 @@
 package com.mahdikh.vision.arrowpanel.widget
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Color
@@ -16,6 +15,7 @@ abstract class Panel(context: Context) : FrameLayout(context), PanelInterface {
     private var mCanceled = false
     private var mDismissed = false
     open var cancelable: Boolean = true
+    open var interactionTouchOutside = false
     open var cancelableOnTouchOutside: Boolean = true
         set(value) {
             field = value
@@ -27,20 +27,20 @@ abstract class Panel(context: Context) : FrameLayout(context), PanelInterface {
     private var cancelListeners: MutableList<PanelInterface.OnCancelListener>? = null
 
     init {
-        isClickable = true
         isFocusable = true
         isFocusableInTouchMode = true
         clipChildren = false
         fitsSystemWindows = false
+        super.setClickable(false)
         super.setLayoutDirection(LAYOUT_DIRECTION_LTR)
         super.setWillNotDraw(false)
     }
 
     @CallSuper
     open fun show() {
-        if (isShowing()) return
         mCanceled = false
         mDismissed = false
+        if (isShowing()) return
         onShow()
         showListeners?.let { it ->
             val size = it.size
@@ -85,12 +85,14 @@ abstract class Panel(context: Context) : FrameLayout(context), PanelInterface {
 
     protected open fun onCancel() {}
 
-    @SuppressLint("ClickableViewAccessibility")
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (cancelableOnTouchOutside && event!!.action == MotionEvent.ACTION_DOWN) {
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (cancelableOnTouchOutside && event.action == MotionEvent.ACTION_DOWN) {
             cancel()
         }
-        return super.onTouchEvent(event)
+        if (interactionTouchOutside) {
+            return super.onTouchEvent(event)
+        }
+        return true
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
@@ -112,6 +114,10 @@ abstract class Panel(context: Context) : FrameLayout(context), PanelInterface {
 
     }
 
+    override fun setClickable(clickable: Boolean) {
+
+    }
+
     open fun onBackPressed() {
         if (cancelable) {
             cancel()
@@ -120,10 +126,6 @@ abstract class Panel(context: Context) : FrameLayout(context), PanelInterface {
 
     open fun isShowing(): Boolean {
         return isAttachedToWindow and isVisible
-    }
-
-    open fun setInteractionTouchOutside(interaction: Boolean) {
-        isClickable = !interaction
     }
 
     open fun setDim(@ColorInt dimColor: Int, @DimDef dimAmount: Float = 0.6F) {

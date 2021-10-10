@@ -29,8 +29,7 @@ open class ArrowPanel(context: Context) : Panel(context) {
     open var drawTargetView: Boolean = true
     open var type: Int = TYPE_DECOR
     open var orientation = ORIENTATION_HORIZONTAL or ORIENTATION_VERTICAL
-    
-    var reusable = false
+    open var reusable = false
 
     @DurationDef
     open var timeOutDuration: Long = DURATION_INFINITE
@@ -621,12 +620,17 @@ open class ArrowPanel(context: Context) : Panel(context) {
         }
 
         fun setInteractionWhenTouchOutside(interaction: Boolean): Builder {
-            arrowPanel.setInteractionTouchOutside(interaction)
+            arrowPanel.interactionTouchOutside = interaction
             return this
         }
 
         fun setTimeOutDuration(duration: Long): Builder {
             arrowPanel.timeOutDuration = duration
+            return this
+        }
+
+        fun setReusable(reusable: Boolean): Builder {
+            arrowPanel.reusable = reusable
             return this
         }
 

@@ -5,6 +5,7 @@ import androidx.annotation.CallSuper
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 
 open class FragmentArrowPanel(context: Context) : ArrowPanel(context) {
     var fragment: Fragment? = null
@@ -19,6 +20,7 @@ open class FragmentArrowPanel(context: Context) : ArrowPanel(context) {
 
     @CallSuper
     fun setContentView(fragment: Fragment) {
+        beginTransaction().remove(fragment).commitNow()
         this.fragment = fragment
         if (fragment is PanelFragment) {
             fragment.panel = this
@@ -30,10 +32,7 @@ open class FragmentArrowPanel(context: Context) : ArrowPanel(context) {
         val frg = fragment
         if (frg != null) {
             if (reusable && frg.isAdded && !frg.isVisible) {
-                getFragmentManger()
-                    .beginTransaction()
-                    .show(frg)
-                    .commit()
+                beginTransaction().show(frg).commit()
             } else if (!frg.isAdded) {
                 onAddFragment(frg)
             }
@@ -43,8 +42,7 @@ open class FragmentArrowPanel(context: Context) : ArrowPanel(context) {
 
     @CallSuper
     protected open fun onAddFragment(fragment: Fragment) {
-        getFragmentManger()
-            .beginTransaction()
+        beginTransaction()
             .add(arrowLayout.id, fragment)
             .commit()
     }
@@ -53,7 +51,7 @@ open class FragmentArrowPanel(context: Context) : ArrowPanel(context) {
     protected open fun onRemoveFragment() {
         val frg = this.fragment
         if (frg != null) {
-            getFragmentManger().beginTransaction().apply {
+            beginTransaction().apply {
                 if (reusable) {
                     hide(frg)
                 } else {
@@ -68,7 +66,11 @@ open class FragmentArrowPanel(context: Context) : ArrowPanel(context) {
         onRemoveFragment()
     }
 
-    private fun getFragmentManger(): FragmentManager {
+    protected open fun beginTransaction(): FragmentTransaction {
+        return getFragmentManger().beginTransaction().setCustomAnimations(0, 0)
+    }
+
+    protected open fun getFragmentManger(): FragmentManager {
         return (context as FragmentActivity).supportFragmentManager
     }
 }
