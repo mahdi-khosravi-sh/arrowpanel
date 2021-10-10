@@ -76,11 +76,12 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Pane
     open fun show() {
         if (type == TYPE_WINDOW) {
             addAsWindow()
-            post {
-                showArrowLayout()
-            }
         } else {
             addInRootViewGroup()
+        }
+        post {
+            arrowLayout.requestLayout()
+            adjustArrowLayoutLocation()
             showArrowLayout()
             requestFocus()
         }
@@ -133,12 +134,10 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Pane
     }
 
     private fun showArrowLayout() {
-        adjustArrowLayoutLocation()
-        animate().alpha(1.0F).duration = 150
-
-        if (type == TYPE_WINDOW) {
-            arrowLayout.requestLayout()
-        }
+        animate()
+            .alpha(1.0F)
+            .setDuration(150)
+            .start()
 
         arrowLayout.show()
         onShowListener?.onShow(this)
