@@ -29,6 +29,8 @@ open class ArrowPanel(context: Context) : Panel(context) {
     open var type: Int = TYPE_DECOR
     open var orientation = ORIENTATION_HORIZONTAL or ORIENTATION_VERTICAL
 
+    var reusable = false
+
     @DurationDef
     open var timeOutDuration: Long = DURATION_INFINITE
         set(value) {
@@ -291,7 +293,9 @@ open class ArrowPanel(context: Context) : Panel(context) {
 
     private fun addInRootViewGroup() {
         getRootViewGroup()?.let { rootView ->
-            addView(arrowLayout)
+            if (arrowLayout.parent == null) {
+                addView(arrowLayout)
+            }
             rootView.addView(this)
         } ?: kotlin.run {
             type = TYPE_WINDOW
@@ -462,6 +466,20 @@ open class ArrowPanel(context: Context) : Panel(context) {
 
     open fun setPivotToArrow(pivotToArrow: Boolean) {
         arrowLayout.pivotToArrow = pivotToArrow
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        if (!reusable) {
+            setOnChildClickListener(null)
+            setOnChildLongClickListener(null)
+            removeAllViews()
+            removeAllShowListeners()
+            removeAllCancelListeners()
+            removeAllDismissListeners()
+            blurView = null
+            targetView = null
+        }
     }
 
     class Builder(context: Context) {

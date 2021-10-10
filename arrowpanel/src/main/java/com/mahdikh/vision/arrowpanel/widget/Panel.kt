@@ -38,13 +38,14 @@ abstract class Panel(context: Context) : FrameLayout(context), PanelInterface {
 
     @CallSuper
     open fun show() {
-        if (!isShowing()) {
-            onShow()
-            showListeners?.let { it ->
-                val size = it.size
-                for (i in 0 until size) {
-                    it[i].onShow(this)
-                }
+        if (isShowing()) return
+        mCanceled = false
+        mDismissed = false
+        onShow()
+        showListeners?.let { it ->
+            val size = it.size
+            for (i in 0 until size) {
+                it[i].onShow(this)
             }
         }
     }

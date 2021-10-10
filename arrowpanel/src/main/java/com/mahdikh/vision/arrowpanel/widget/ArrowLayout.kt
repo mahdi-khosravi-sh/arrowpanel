@@ -140,6 +140,7 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
 
     @CallSuper
     open fun show() {
+        syncArrowPath = true
         firstYAxis = y
         firstXAxis = x
         animator?.animateShow(this)
