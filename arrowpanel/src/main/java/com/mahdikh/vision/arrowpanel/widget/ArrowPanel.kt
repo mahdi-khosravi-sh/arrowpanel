@@ -22,13 +22,14 @@ open class ArrowPanel(context: Context) : Panel(context) {
     private val targetLocation: IntArray = IntArray(2)
     private var blurView: BlurView? = null
     open var targetView: View? = null
+    open var drawBlurEffect = false
     open var blurQuality: Int = 10
     open var blurRadius: Float = 5.0F
     open var arrowMargin: Int = 5
     open var drawTargetView: Boolean = true
     open var type: Int = TYPE_DECOR
     open var orientation = ORIENTATION_HORIZONTAL or ORIENTATION_VERTICAL
-
+    
     var reusable = false
 
     @DurationDef
@@ -59,7 +60,24 @@ open class ArrowPanel(context: Context) : Panel(context) {
         show()
     }
 
+    protected open fun createBlurView() {
+        blurView = BlurView(context).also {
+            it.addNoBlurView(this)
+            it.setOverlapView(this)
+            if (drawTargetView) {
+                targetView?.let { target ->
+                    it.addNoBlurView(target)
+                }
+            }
+        }
+        addView(blurView, 0)
+    }
+
     override fun onShow() {
+        if (drawBlurEffect) {
+            createBlurView()
+        }
+
         if (type == TYPE_WINDOW) {
             addAsWindow()
         } else {
@@ -75,15 +93,16 @@ open class ArrowPanel(context: Context) : Panel(context) {
 
     override fun onDismiss() {
         arrowLayout.hide()
-        removeView()
+        hide()
     }
 
-    open fun removeView() {
-        animate().apply {
-            alpha(0.0F)
-            duration = 250
-            withEndAction {
-                blurView?.let {
+    private fun hide() {
+        animate()
+            .alpha(0.0F)
+            .setDuration(250)
+            .withEndAction {
+                val bv = blurView
+                if (bv != null) {
                     removeView(blurView)
                     blurView = null
                 }
@@ -93,7 +112,7 @@ open class ArrowPanel(context: Context) : Panel(context) {
                     getRootViewGroup()?.removeView(this@ArrowPanel)
                 }
             }
-        }.start()
+            .start()
     }
 
     private fun showArrowLayout() {
@@ -322,19 +341,6 @@ open class ArrowPanel(context: Context) : Panel(context) {
         arrowLayout.layoutDirection = layoutDirection
     }
 
-    protected open fun createBlurView() {
-        blurView = BlurView(context).also {
-            it.addNoBlurView(this)
-            it.setOverlapView(this)
-            if (drawTargetView) {
-                targetView?.let { target ->
-                    it.addNoBlurView(target)
-                }
-            }
-        }
-        addView(blurView, 0)
-    }
-
     open fun resetTimeout() {
         removeCallbacks(dismissRunnable)
         if (timeOutDuration != DURATION_INFINITE) {
@@ -409,15 +415,6 @@ open class ArrowPanel(context: Context) : Panel(context) {
 
     open fun clearShadow() {
         arrowLayout.clearShadow()
-    }
-
-    open fun setDrawBlurEffect(drawBlurEffect: Boolean) {
-        if (drawBlurEffect) {
-            createBlurView()
-        } else if (blurView != null) {
-            removeView(blurView)
-            blurView = null
-        }
     }
 
     open fun setDrawArrow(drawArrow: Boolean) {
@@ -598,8 +595,8 @@ open class ArrowPanel(context: Context) : Panel(context) {
             return this
         }
 
-        fun setDrawBlurEffect(blurEffect: Boolean): Builder {
-            panelParams.drawBlurEffect = blurEffect
+        fun setDrawBlurEffect(drawBlurEffect: Boolean): Builder {
+            arrowPanel.drawBlurEffect = drawBlurEffect
             return this
         }
 

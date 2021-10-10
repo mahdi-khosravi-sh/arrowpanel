@@ -6,7 +6,6 @@ class PanelParams {
     var mViewLayoutResId: Int = 0
     var mView: View? = null
     var targetView: View? = null
-    var drawBlurEffect = false
 
     var onChildClickListener: PanelInterface.OnChildClickListener? = null
     var onChildLongClickListener: PanelInterface.OnChildLongClickListener? = null
@@ -30,9 +29,5 @@ class PanelParams {
         }
 
         panel.targetView = targetView
-
-        if (drawBlurEffect) {
-            panel.setDrawBlurEffect(true)
-        }
     }
 }
