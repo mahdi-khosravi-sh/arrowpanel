@@ -22,9 +22,9 @@ abstract class Panel(context: Context) : FrameLayout(context), PanelInterface {
             isFocusable = value
         }
 
-    private var onShowListener: PanelInterface.OnShowListener? = null
-    private var onDismissListener: PanelInterface.OnDismissListener? = null
-    private var onCancelListener: PanelInterface.OnCancelListener? = null
+    private var showListeners: MutableList<PanelInterface.OnShowListener>? = null
+    private var dismissListeners: MutableList<PanelInterface.OnDismissListener>? = null
+    private var cancelListeners: MutableList<PanelInterface.OnCancelListener>? = null
 
     init {
         isClickable = true
@@ -40,7 +40,12 @@ abstract class Panel(context: Context) : FrameLayout(context), PanelInterface {
     open fun show() {
         if (!isShowing()) {
             onShow()
-            onShowListener?.onShow(this)
+            showListeners?.let { it ->
+                val size = it.size
+                for (i in 0 until size) {
+                    it[i].onShow(this)
+                }
+            }
         }
     }
 
@@ -48,7 +53,12 @@ abstract class Panel(context: Context) : FrameLayout(context), PanelInterface {
     override fun dismiss() {
         if (!mDismissed) {
             onDismiss()
-            onDismissListener?.onDismiss(this)
+            dismissListeners?.let { it ->
+                val size = it.size
+                for (i in 0 until size) {
+                    it[i].onDismiss(this)
+                }
+            }
             mDismissed = true
         }
     }
@@ -58,7 +68,12 @@ abstract class Panel(context: Context) : FrameLayout(context), PanelInterface {
         if (!mCanceled) {
             mCanceled = true
             onCancel()
-            onCancelListener?.onCancel(this)
+            cancelListeners?.let { it ->
+                val size = it.size
+                for (i in 0 until size) {
+                    it[i].onCancel(this)
+                }
+            }
             dismiss()
         }
     }
@@ -121,16 +136,67 @@ abstract class Panel(context: Context) : FrameLayout(context), PanelInterface {
         )
     }
 
-    open fun setOnShowListener(onShowListener: PanelInterface.OnShowListener?) {
-        this.onShowListener = onShowListener
+    fun addOnShowListener(onShowListener: PanelInterface.OnShowListener) {
+        if (showListeners == null) {
+            showListeners = mutableListOf()
+        }
+        showListeners?.add(onShowListener)
     }
 
-    open fun setOnDismissListener(onDismissListener: PanelInterface.OnDismissListener?) {
-        this.onDismissListener = onDismissListener
+    fun addOnDismissListener(onDismissListener: PanelInterface.OnDismissListener) {
+        if (dismissListeners == null) {
+            dismissListeners = mutableListOf()
+        }
+        dismissListeners?.add(onDismissListener)
     }
 
-    open fun setOnCancelListener(onCancelListener: PanelInterface.OnCancelListener?) {
-        this.onCancelListener = onCancelListener
+    fun addOnCancelListener(onCancelListener: PanelInterface.OnCancelListener) {
+        if (cancelListeners == null) {
+            cancelListeners = mutableListOf()
+        }
+        cancelListeners?.add(onCancelListener)
+    }
+
+    fun removeOnShowListener(onShowListener: PanelInterface.OnShowListener) {
+        showListeners?.let {
+            it.remove(onShowListener)
+            if (it.size == 0) {
+                showListeners = null
+            }
+        }
+    }
+
+    fun removeOnDismissListener(onDismissListener: PanelInterface.OnDismissListener) {
+        dismissListeners?.let {
+            it.remove(onDismissListener)
+            if (it.isEmpty()) {
+                dismissListeners = null
+            }
+        }
+    }
+
+    fun removeOnCancelListener(onCancelListener: PanelInterface.OnCancelListener) {
+        cancelListeners?.let {
+            it.remove(onCancelListener)
+            if (it.isEmpty()) {
+                cancelListeners = null
+            }
+        }
+    }
+
+    fun removeAllShowListeners() {
+        (showListeners ?: return).clear()
+        showListeners = null
+    }
+
+    fun removeAllDismissListeners() {
+        (dismissListeners ?: return).clear()
+        dismissListeners = null
+    }
+
+    fun removeAllCancelListeners() {
+        (cancelListeners ?: return).clear()
+        cancelListeners = null
     }
 
     @kotlin.annotation.Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)

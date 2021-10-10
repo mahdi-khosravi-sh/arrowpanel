@@ -615,18 +615,18 @@ open class ArrowPanel(context: Context) : Panel(context) {
             return this
         }
 
-        fun setOnShowListener(onShowListener: PanelInterface.OnShowListener?): Builder {
-            arrowPanel.setOnShowListener(onShowListener)
+        fun addOnShowListener(onShowListener: PanelInterface.OnShowListener): Builder {
+            arrowPanel.addOnShowListener(onShowListener)
             return this
         }
 
-        fun setOnDismissListener(onDismissListener: PanelInterface.OnDismissListener?): Builder {
-            arrowPanel.setOnDismissListener(onDismissListener)
+        fun addOnDismissListener(onDismissListener: PanelInterface.OnDismissListener): Builder {
+            arrowPanel.addOnDismissListener(onDismissListener)
             return this
         }
 
-        fun setOnCancelListener(onCancelListener: PanelInterface.OnCancelListener?): Builder {
-            arrowPanel.setOnCancelListener(onCancelListener)
+        fun addOnCancelListener(onCancelListener: PanelInterface.OnCancelListener): Builder {
+            arrowPanel.addOnCancelListener(onCancelListener)
             return this
         }
 
