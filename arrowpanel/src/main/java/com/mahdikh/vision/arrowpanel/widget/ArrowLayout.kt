@@ -10,7 +10,6 @@ import android.graphics.Path
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.CallSuper
 import androidx.annotation.ColorInt
@@ -69,14 +68,6 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
         strokePaint.color = Color.WHITE
 
         adjustAttrsFromTheme(context)
-    }
-
-    override fun setLayoutParams(params: ViewGroup.LayoutParams?) {
-        params?.apply {
-            width = LayoutParams.WRAP_CONTENT
-            height = LayoutParams.WRAP_CONTENT
-        }
-        super.setLayoutParams(params)
     }
 
     private fun adjustAttrsFromTheme(context: Context) {
@@ -410,6 +401,19 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
 
     open fun setShadow(radius: Float, dx: Float, dy: Float, shadowColor: Int) {
         paint.setShadowLayer(radius, dx, dy, shadowColor)
+    }
+
+    companion object {
+        @JvmStatic
+        fun newInstance(context: Context): ArrowLayout {
+            return ArrowLayout(context).apply {
+                id = View.generateViewId()
+                layoutParams = LayoutParams(
+                    LayoutParams.WRAP_CONTENT,
+                    LayoutParams.WRAP_CONTENT
+                )
+            }
+        }
     }
 
     @kotlin.annotation.Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)

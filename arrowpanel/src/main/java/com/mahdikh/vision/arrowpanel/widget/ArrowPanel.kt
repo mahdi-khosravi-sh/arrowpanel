@@ -23,14 +23,11 @@ import androidx.fragment.app.FragmentActivity
 import com.mahdikh.vision.arrowpanel.animator.BaseAnimator
 import com.mahdikh.vision.arrowpanel.touchanimator.TouchAnimator
 
-open class ArrowPanel constructor(context: Context) : FrameLayout(context),
-    PanelInterface {
+open class ArrowPanel constructor(context: Context) : FrameLayout(context), PanelInterface {
     private val targetLocation: IntArray = IntArray(2)
     private var blurView: BlurView? = null
+    val arrowLayout = ArrowLayout.newInstance(context)
     open var targetView: View? = null
-    var arrowLayout: ArrowLayout
-        private set
-
     open var blurQuality: Int = 10
     open var blurRadius: Float = 5.0F
     open var arrowMargin: Int = 5
@@ -72,7 +69,6 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context),
         isFocusableInTouchMode = true
         clipChildren = false
         fitsSystemWindows = false
-        arrowLayout = ArrowLayout(context)
         super.setLayoutDirection(LAYOUT_DIRECTION_LTR)
         super.setWillNotDraw(false)
     }
