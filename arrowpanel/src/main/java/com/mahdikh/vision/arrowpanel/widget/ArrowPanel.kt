@@ -1,10 +1,7 @@
 package com.mahdikh.vision.arrowpanel.widget
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.Configuration
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Point
 import android.os.Build
@@ -13,37 +10,23 @@ import android.view.*
 import android.view.View.OnClickListener
 import android.view.View.OnLongClickListener
 import android.view.WindowManager.LayoutParams
-import android.widget.FrameLayout
 import androidx.annotation.ColorInt
-import androidx.annotation.FloatRange
 import androidx.annotation.LayoutRes
 import androidx.annotation.LongDef
-import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import com.mahdikh.vision.arrowpanel.animator.BaseAnimator
 import com.mahdikh.vision.arrowpanel.touchanimator.TouchAnimator
 
-open class ArrowPanel constructor(context: Context) : FrameLayout(context), PanelInterface {
+open class ArrowPanel(context: Context) : Panel(context) {
+    val arrowLayout = ArrowLayout.newInstance(context)
     private val targetLocation: IntArray = IntArray(2)
     private var blurView: BlurView? = null
-    val arrowLayout = ArrowLayout.newInstance(context)
     open var targetView: View? = null
     open var blurQuality: Int = 10
     open var blurRadius: Float = 5.0F
     open var arrowMargin: Int = 5
     open var drawTargetView: Boolean = true
-    private var mCanceled = false
-    private var mDismissed = false
-
     open var type: Int = TYPE_DECOR
-
-    open var cancelable: Boolean = true
-    open var cancelableOnTouchOutside: Boolean = true
-        set(value) {
-            field = value
-            isFocusable = value
-        }
-
     open var orientation = ORIENTATION_HORIZONTAL or ORIENTATION_VERTICAL
 
     @DurationDef
@@ -55,36 +38,12 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Pane
             field = value
         }
 
-    private var onShowListener: PanelInterface.OnShowListener? = null
-    private var onDismissListener: PanelInterface.OnDismissListener? = null
-    private var onCancelListener: PanelInterface.OnCancelListener? = null
     private var childClickListener: OnClickListener? = null
     private var childLongClickListener: OnLongClickListener? = null
     private val dismissRunnable = Runnable { dismiss() }
 
     init {
         alpha = 0.0F
-        isClickable = true
-        isFocusable = true
-        isFocusableInTouchMode = true
-        clipChildren = false
-        fitsSystemWindows = false
-        super.setLayoutDirection(LAYOUT_DIRECTION_LTR)
-        super.setWillNotDraw(false)
-    }
-
-    open fun show() {
-        if (type == TYPE_WINDOW) {
-            addAsWindow()
-        } else {
-            addInRootViewGroup()
-        }
-        post {
-            arrowLayout.requestLayout()
-            adjustArrowLayoutLocation()
-            showArrowLayout()
-            requestFocus()
-        }
     }
 
     open fun show(targetView: View) {
@@ -98,21 +57,23 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Pane
         show()
     }
 
-    override fun dismiss() {
-        if (!mDismissed) {
-            arrowLayout.hide()
-            removeView()
-            mDismissed = true
-            onDismissListener?.onDismiss(this)
+    override fun onShow() {
+        if (type == TYPE_WINDOW) {
+            addAsWindow()
+        } else {
+            addInRootViewGroup()
+        }
+        post {
+            arrowLayout.requestLayout()
+            adjustArrowLayoutLocation()
+            showArrowLayout()
+            requestFocus()
         }
     }
 
-    override fun cancel() {
-        if (!mCanceled) {
-            mCanceled = true
-            onCancelListener?.onCancel(this)
-            dismiss()
-        }
+    override fun onDismiss() {
+        arrowLayout.hide()
+        removeView()
     }
 
     open fun removeView() {
@@ -134,21 +95,14 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Pane
     }
 
     private fun showArrowLayout() {
-        animate()
-            .alpha(1.0F)
-            .setDuration(150)
-            .start()
-
+        animate().alpha(1.0F).setDuration(150).start()
         arrowLayout.show()
-        onShowListener?.onShow(this)
-
         blurView?.let {
             val sourceView = getRootViewGroup()
             if (sourceView != null) {
                 it.blur(sourceView, blurQuality, blurRadius, false)
             }
         }
-
         if (timeOutDuration != DURATION_INFINITE) {
             postDelayed(dismissRunnable, timeOutDuration)
         }
@@ -345,29 +299,6 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Pane
         }
     }
 
-    override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
-        if (event?.keyCode == KeyEvent.KEYCODE_BACK) {
-            if (event.action == KeyEvent.ACTION_UP) {
-                onBackPressed()
-                return true
-            }
-        }
-        return super.dispatchKeyEvent(event)
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration?) {
-        super.onConfigurationChanged(newConfig)
-        cancel()
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (cancelableOnTouchOutside && event!!.action == MotionEvent.ACTION_DOWN) {
-            cancel()
-        }
-        return super.onTouchEvent(event)
-    }
-
     override fun onDrawForeground(canvas: Canvas) {
         super.onDrawForeground(canvas)
         if (drawTargetView) {
@@ -400,12 +331,6 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Pane
         addView(blurView, 0)
     }
 
-    open fun onBackPressed() {
-        if (cancelable) {
-            cancel()
-        }
-    }
-
     open fun resetTimeout() {
         removeCallbacks(dismissRunnable)
         if (timeOutDuration != DURATION_INFINITE) {
@@ -423,14 +348,6 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Pane
 
     open fun getAnimator(): BaseAnimator? {
         return arrowLayout.animator
-    }
-
-    open fun isShowing(): Boolean {
-        return isAttachedToWindow and isVisible
-    }
-
-    open fun setInteractionTouchOutside(interaction: Boolean) {
-        isClickable = !interaction
     }
 
     open fun setContentView(layoutId: Int): View {
@@ -499,17 +416,6 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Pane
         }
     }
 
-    open fun setDim(dimColor: Int, @DimDef dimAmount: Float = 0.6F) {
-        setBackgroundColor(
-            Color.argb(
-                (dimAmount * 255).toInt(),
-                Color.red(dimColor),
-                Color.green(dimColor),
-                Color.blue(dimColor),
-            )
-        )
-    }
-
     open fun setDrawArrow(drawArrow: Boolean) {
         arrowLayout.drawArrow = drawArrow
     }
@@ -522,18 +428,6 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Pane
     open fun setLocation(motionEvent: MotionEvent) {
         targetLocation[0] = motionEvent.rawX.toInt()
         targetLocation[1] = motionEvent.rawY.toInt()
-    }
-
-    open fun setOnShowListener(onShowListener: PanelInterface.OnShowListener?) {
-        this.onShowListener = onShowListener
-    }
-
-    open fun setOnDismissListener(onDismissListener: PanelInterface.OnDismissListener?) {
-        this.onDismissListener = onDismissListener
-    }
-
-    open fun setOnCancelListener(onCancelListener: PanelInterface.OnCancelListener?) {
-        this.onCancelListener = onCancelListener
     }
 
     open fun setOnChildClickListener(
@@ -823,9 +717,4 @@ open class ArrowPanel constructor(context: Context) : FrameLayout(context), Pane
             return context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         }
     }
-
-    @kotlin.annotation.Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
-    @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
-    @FloatRange(from = 0.0, to = 1.0)
-    annotation class DimDef
 }
