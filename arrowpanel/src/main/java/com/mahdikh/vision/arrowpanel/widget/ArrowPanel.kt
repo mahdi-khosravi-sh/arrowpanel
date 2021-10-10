@@ -72,7 +72,8 @@ open class ArrowPanel(context: Context) : Panel(context) {
         addView(blurView, 0)
     }
 
-    override fun onShow() {
+    override fun show() {
+        super.show()
         if (drawBlurEffect) {
             createBlurView()
         }
@@ -82,6 +83,9 @@ open class ArrowPanel(context: Context) : Panel(context) {
         } else {
             addInRootViewGroup()
         }
+    }
+
+    override fun onShow() {
         post {
             arrowLayout.requestLayout()
             adjustArrowLayoutLocation()

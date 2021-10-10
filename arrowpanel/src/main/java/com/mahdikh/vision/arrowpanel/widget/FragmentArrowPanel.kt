@@ -8,7 +8,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 
 open class FragmentArrowPanel(context: Context) : ArrowPanel(context) {
-    var fragment: Fragment? = null
+    var mFragment: PanelFragment? = null
+    var showOnResume = true
 
     override var type: Int = TYPE_DECOR
         get() = super.type
@@ -19,25 +20,34 @@ open class FragmentArrowPanel(context: Context) : ArrowPanel(context) {
         }
 
     @CallSuper
-    fun setContentView(fragment: Fragment) {
+    fun setContentView(fragment: PanelFragment) {
         beginTransaction().remove(fragment).commitNow()
-        this.fragment = fragment
-        if (fragment is PanelFragment) {
-            fragment.panel = this
-        }
+        fragment.panel = this
+        this.mFragment = fragment
     }
 
     @CallSuper
     override fun onShow() {
-        val frg = fragment
+        val frg = mFragment
         if (frg != null) {
             if (reusable && frg.isAdded && !frg.isVisible) {
                 beginTransaction().show(frg).commit()
+                super.onShow()
             } else if (!frg.isAdded) {
-                onAddFragment(frg)
+                if (showOnResume) {
+                    frg.onResumeListener = PanelFragment.OnResumeListener {
+                        super.onShow()
+                        frg.onResumeListener = null
+                    }
+                    onAddFragment(frg)
+                } else {
+                    onAddFragment(frg)
+                    super.onShow()
+                }
             }
+        } else {
+            super.onShow()
         }
-        super.onShow()
     }
 
     @CallSuper
@@ -49,7 +59,7 @@ open class FragmentArrowPanel(context: Context) : ArrowPanel(context) {
 
     @CallSuper
     protected open fun onRemoveFragment() {
-        val frg = this.fragment
+        val frg = this.mFragment
         if (frg != null) {
             beginTransaction().apply {
                 if (reusable) {

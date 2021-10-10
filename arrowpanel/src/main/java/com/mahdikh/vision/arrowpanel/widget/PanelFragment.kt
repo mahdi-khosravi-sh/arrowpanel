@@ -5,6 +5,12 @@ import androidx.fragment.app.Fragment
 
 abstract class PanelFragment : Fragment() {
     lateinit var panel: Panel
+    internal var onResumeListener: OnResumeListener? = null
+
+    override fun onResume() {
+        super.onResume()
+        onResumeListener?.onResume()
+    }
 
     open fun dismiss() {
         panel.dismiss()
@@ -32,5 +38,9 @@ abstract class PanelFragment : Fragment() {
 
     open fun isShowingPanel(): Boolean {
         return panel.isShowing()
+    }
+
+    fun interface OnResumeListener {
+        fun onResume()
     }
 }
