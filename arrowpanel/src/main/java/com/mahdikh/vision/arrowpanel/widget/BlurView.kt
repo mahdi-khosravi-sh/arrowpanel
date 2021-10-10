@@ -15,7 +15,7 @@ import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import java.util.*
 
-class BlurView(context: Context?) : View(context) {
+internal class BlurView(context: Context?) : View(context) {
     private val noBlurViews: MutableList<View> = mutableListOf()
     private var overlapView: View? = null
 
