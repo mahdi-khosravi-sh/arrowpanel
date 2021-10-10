@@ -23,7 +23,7 @@ abstract class PanelFragment : Fragment() {
     }
 
     open fun setInteractionTouchOutside(interaction: Boolean) {
-        panel.setInteractionTouchOutside(interaction)
+        panel.interactionTouchOutside = interaction
     }
 
     open fun setDim(@ColorInt dimColor: Int, @Panel.DimDef dimAmount: Float = 0.6F) {
