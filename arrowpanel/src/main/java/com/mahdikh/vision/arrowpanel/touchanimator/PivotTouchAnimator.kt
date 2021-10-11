@@ -10,8 +10,8 @@ abstract class PivotTouchAnimator : TouchAnimator() {
     override fun onTouchDown(view: View) {
         if (centerPivot) {
             view.apply {
-                pivotX = width / 2F
-                pivotY = width / 2F
+                pivotX = measuredWidth / 2F
+                pivotY = measuredHeight / 2F
             }
         }
     }
