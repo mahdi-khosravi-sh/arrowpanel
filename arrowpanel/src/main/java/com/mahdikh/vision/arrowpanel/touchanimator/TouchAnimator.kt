@@ -1,27 +1,24 @@
 package com.mahdikh.vision.arrowpanel.touchanimator
 
-import android.animation.TimeInterpolator
 import android.view.MotionEvent
 import android.view.View
-import androidx.annotation.CallSuper
 
 abstract class TouchAnimator {
-    var duration: Long = 200
-    var interpolator: TimeInterpolator? = null
-
-    @CallSuper
-    open fun animateTouch(view: View, action: Int) {
-        when (action) {
+    fun dispatchTouchEvent(view: View, ev: MotionEvent) {
+        when (ev.action) {
             MotionEvent.ACTION_DOWN -> {
-                animateTouchDownImpl(view)
+                onTouchDown(view)
             }
             MotionEvent.ACTION_UP -> {
-                animateTouchUpImpl(view)
+                onTouchUp(view)
             }
         }
+        onTouchEvent(view, ev)
     }
 
-    protected abstract fun animateTouchDownImpl(view: View)
+    open fun onTouchDown(view: View) {}
 
-    protected abstract fun animateTouchUpImpl(view: View)
+    open fun onTouchEvent(view: View, ev: MotionEvent) {}
+
+    open fun onTouchUp(view: View) {}
 }

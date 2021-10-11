@@ -2,22 +2,22 @@ package com.mahdikh.vision.arrowpanel.touchanimator
 
 import android.view.View
 
-class FadeTouchAnimator : TouchAnimator() {
+class FadeTouchAnimator : ActionTouchAnimator() {
     var toAlpha: Float = 0.85F
 
     override fun animateTouchDownImpl(view: View) {
-        view.animate().apply {
-            alpha(toAlpha)
-            duration = this@FadeTouchAnimator.duration
-            interpolator = null
-        }.start()
+        view.animate()
+            .alpha(toAlpha)
+            .setInterpolator(null)
+            .setDuration(duration)
+            .start()
     }
 
     override fun animateTouchUpImpl(view: View) {
-        view.animate().apply {
-            alpha(1.0F)
-            duration = this@FadeTouchAnimator.duration
-            interpolator = null
-        }.start()
+        view.animate()
+            .alpha(1.0F)
+            .setInterpolator(null)
+            .setDuration(duration)
+            .start()
     }
 }

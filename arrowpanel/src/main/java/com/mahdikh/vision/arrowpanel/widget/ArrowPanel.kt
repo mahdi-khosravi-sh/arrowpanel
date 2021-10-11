@@ -15,6 +15,7 @@ import androidx.annotation.LayoutRes
 import androidx.annotation.LongDef
 import androidx.fragment.app.FragmentActivity
 import com.mahdikh.vision.arrowpanel.animator.BaseAnimator
+import com.mahdikh.vision.arrowpanel.internal.clear
 import com.mahdikh.vision.arrowpanel.touchanimator.TouchAnimator
 
 open class ArrowPanel(context: Context) : Panel(context) {
@@ -470,6 +471,7 @@ open class ArrowPanel(context: Context) : Panel(context) {
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        clear(arrowLayout)
         if (!reusable) {
             setOnChildClickListener(null)
             setOnChildLongClickListener(null)

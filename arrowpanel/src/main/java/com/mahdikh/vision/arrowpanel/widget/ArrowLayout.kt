@@ -122,10 +122,7 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        val action = ev.action
-        if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP) {
-            touchAnimator?.animateTouch(this, action)
-        }
+        touchAnimator?.dispatchTouchEvent(this, ev)
         return super.dispatchTouchEvent(ev)
     }
 
