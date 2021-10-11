@@ -6,17 +6,20 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.view.animation.OvershootInterpolator
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.mahdikh.vision.arrowpanel.animator.ScaleAnimator
 import com.mahdikh.vision.arrowpanel.animator.SlideAnimator
+import com.mahdikh.vision.arrowpanel.touchanimator.RotationXYTouchAnimator
 import com.mahdikh.vision.arrowpanel.widget.ArrowPanel
+import com.mahdikh.vision.arrowpanel.widget.FragmentArrowPanel
 
 class MainActivity : AppCompatActivity() {
     private lateinit var motionEvent: MotionEvent
-
+    private var frg: ImageFragment = ImageFragment()
+    private var frgPanel: FragmentArrowPanel? = null
     private val touchListener = object : View.OnTouchListener {
         var x: Float = 0.0F
         var y: Float = 0.0F
@@ -42,14 +45,36 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         findViews()
-
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private fun findViews() {
         findViewById<View>(R.id.btn).setOnTouchListener(touchListener)
+        findViewById<View>(R.id.btn2).setOnTouchListener(touchListener)
         findViewById<View>(R.id.root).setOnClickListener { showFaPanel() }
         findViewById<View>(R.id.btn).setOnClickListener { showPanel(it) }
+        findViewById<View>(R.id.btn2).setOnClickListener { showPanelFragment(it) }
+    }
+
+    private fun showPanelFragment(v: View) {
+        if (frgPanel == null) {
+            frgPanel = FragmentArrowPanel(this).apply {
+                setContentView(frg)
+                setDim(Color.BLACK, 0.3F)
+                setAnimator(ScaleAnimator().apply {
+                    duration = 250
+                    interpolator = OvershootInterpolator()
+                })
+                setFillColor(Color.WHITE)
+                setTouchAnimator(RotationXYTouchAnimator())
+                setPivotToArrow(true)
+                showOnResume = true
+                reusable = true
+                show(v)
+            }
+        } else {
+            frgPanel?.show(v)
+        }
     }
 
     private fun showFaPanel() {
@@ -68,18 +93,18 @@ class MainActivity : AppCompatActivity() {
             .setType(ArrowPanel.TYPE_DECOR)
             .setLocation(motionEvent)
             .clearShadow()
-            .setAnimator(ScaleAnimator().apply {
-                interpolator = FastOutSlowInInterpolator()
+            .setAnimator(SlideAnimator(Gravity.BOTTOM).apply {
+                interpolator = OvershootInterpolator()
             })
             .setInteractionWhenTouchOutside(false)
             .setCancelableOnTouchOutside(true)
             .setCancelable(true)
             .setDrawArrow(true)
-            .setPivotToArrow(true)
             .setArrowMargin(0)
             .setDrawBlurEffect(false)
             .setBlurQuality(10)
             .setBlurRadius(10F)
+            .setPivotToArrow(true)
             .setContentView(R.layout.panel_fa)
             .show()
     }
@@ -101,7 +126,10 @@ class MainActivity : AppCompatActivity() {
                 arrowInterface.dismiss()
                 true
             })
-            .setAnimator(SlideAnimator(Gravity.BOTTOM).apply { hideReverse = false })
+            .setAnimator(SlideAnimator(Gravity.BOTTOM).apply {
+                hideReverse = false
+            })
+            .setTouchAnimator(RotationXYTouchAnimator())
             .setFillColor(Color.parseColor("#EE444444"))
             .clearShadow()
             .show(view)
