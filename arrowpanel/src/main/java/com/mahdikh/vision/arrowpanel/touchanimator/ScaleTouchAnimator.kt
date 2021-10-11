@@ -3,8 +3,14 @@ package com.mahdikh.vision.arrowpanel.touchanimator
 import android.view.View
 import android.view.animation.OvershootInterpolator
 
-class ScaleTouchAnimator : ActionTouchAnimator() {
+class ScaleTouchAnimator : ActionTouchAnimator {
     var toScale: Float = 0.9F
+
+    constructor() : super()
+
+    constructor(toScale: Float) : super() {
+        this.toScale = toScale
+    }
 
     init {
         centerPivot = false

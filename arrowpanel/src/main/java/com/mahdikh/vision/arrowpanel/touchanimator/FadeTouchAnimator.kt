@@ -2,8 +2,13 @@ package com.mahdikh.vision.arrowpanel.touchanimator
 
 import android.view.View
 
-class FadeTouchAnimator : ActionTouchAnimator() {
+class FadeTouchAnimator : ActionTouchAnimator {
     var toAlpha: Float = 0.85F
+
+    constructor() : super()
+    constructor(toAlpha: Float) : super() {
+        this.toAlpha = toAlpha
+    }
 
     override fun animateTouchDownImpl(view: View) {
         view.animate()
