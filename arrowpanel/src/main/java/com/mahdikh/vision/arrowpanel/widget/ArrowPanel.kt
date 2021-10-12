@@ -1,6 +1,7 @@
 package com.mahdikh.vision.arrowpanel.widget
 
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Canvas
 import android.graphics.PixelFormat
 import android.graphics.Point
@@ -469,6 +470,13 @@ open class ArrowPanel(context: Context) : Panel(context) {
         arrowLayout.pivotToArrow = pivotToArrow
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        if (!cancelOnConfigurationChange) {
+            post { adjustArrowLayoutLocation() }
+        }
+    }
+
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         clear(arrowLayout)
@@ -637,6 +645,11 @@ open class ArrowPanel(context: Context) : Panel(context) {
 
         fun setReusable(reusable: Boolean): Builder {
             arrowPanel.reusable = reusable
+            return this
+        }
+
+        fun setCancelOnConfigurationChange(cancel: Boolean): Builder {
+            arrowPanel.cancelOnConfigurationChange = cancel
             return this
         }
 

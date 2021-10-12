@@ -15,6 +15,7 @@ abstract class Panel(context: Context) : FrameLayout(context), PanelInterface {
     private var mCanceled = false
     private var mDismissed = false
     open var cancelable: Boolean = true
+    open var cancelOnConfigurationChange = false
     open var interactionTouchOutside = false
     open var cancelableOnTouchOutside: Boolean = true
         set(value) {
@@ -97,7 +98,9 @@ abstract class Panel(context: Context) : FrameLayout(context), PanelInterface {
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
-        cancel()
+        if (cancelOnConfigurationChange) {
+            cancel()
+        }
     }
 
     override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
