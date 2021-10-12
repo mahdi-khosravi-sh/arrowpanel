@@ -52,22 +52,24 @@ open class FragmentArrowPanel(context: Context) : ArrowPanel(context) {
 
     @CallSuper
     protected open fun onAddFragment(fragment: Fragment) {
-        beginTransaction()
-            .add(arrowLayout.id, fragment)
-            .commit()
+        beginTransaction().add(arrowLayout.id, fragment).commit()
     }
 
     @CallSuper
     protected open fun onRemoveFragment() {
         val frg = this.mFragment
         if (frg != null) {
-            beginTransaction().apply {
-                if (reusable) {
-                    hide(frg)
-                } else {
-                    remove(frg)
-                }
-            }.commit()
+            val manager = getFragmentManger()
+            if (!manager.isDestroyed) {
+                manager.beginTransaction().apply {
+                    setCustomAnimations(0, 0)
+                    if (reusable) {
+                        hide(frg)
+                    } else {
+                        remove(frg)
+                    }
+                }.commit()
+            }
         }
     }
 
