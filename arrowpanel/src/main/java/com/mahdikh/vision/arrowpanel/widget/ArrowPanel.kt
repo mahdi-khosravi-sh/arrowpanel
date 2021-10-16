@@ -33,6 +33,9 @@ open class ArrowPanel(context: Context) : Panel(context) {
     open var orientation = ORIENTATION_HORIZONTAL or ORIENTATION_VERTICAL
     open var reusable = false
 
+    var maxHeightPercent = 0
+    var maxWidthPercent = 0
+
     @DurationDef
     open var timeOutDuration: Long = DURATION_INFINITE
         set(value) {
@@ -134,7 +137,19 @@ open class ArrowPanel(context: Context) : Panel(context) {
         }
     }
 
+    private fun adjustMaximumSizes() {
+        if (maxHeightPercent > 0) {
+            val maxHeight = (rootView.height * (maxHeightPercent / 100F)).toInt()
+            arrowLayout.maxHeight = maxHeight
+        }
+        if (maxWidthPercent > 0) {
+            val maxWidth = (rootView.width * (maxWidthPercent / 100F)).toInt()
+            arrowLayout.maxWidth = maxWidth
+        }
+    }
+
     private fun adjustArrowLayoutLocation() {
+        adjustMaximumSizes()
         measure(0, 0)
 
         val pWidth = rootView.width
@@ -650,6 +665,16 @@ open class ArrowPanel(context: Context) : Panel(context) {
 
         fun setCancelOnConfigurationChange(cancel: Boolean): Builder {
             arrowPanel.cancelOnConfigurationChange = cancel
+            return this
+        }
+
+        fun setMaxHeightPercent(maxHeightPercent: Int): Builder {
+            arrowPanel.maxHeightPercent = maxHeightPercent
+            return this
+        }
+
+        fun setMaxWidthPercent(maxWidthPercent: Int): Builder {
+            arrowPanel.maxWidthPercent = maxWidthPercent
             return this
         }
 

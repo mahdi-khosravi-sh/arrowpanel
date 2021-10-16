@@ -18,6 +18,7 @@ import androidx.core.view.setPadding
 import com.mahdikh.vision.arrowpanel.R
 import com.mahdikh.vision.arrowpanel.animator.BaseAnimator
 import com.mahdikh.vision.arrowpanel.touchanimator.TouchAnimator
+import kotlin.math.min
 
 open class ArrowLayout(context: Context) : FrameLayout(context) {
     val strokePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -39,6 +40,9 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
     private var drawStroke = false
     var arrowEdge: Int = Gravity.NO_GRAVITY
         private set
+
+    var maxHeight: Int = -1
+    var maxWidth: Int = -1
 
     var arrowWidth: Int = 20
     var arrowHeight: Int = 15
@@ -119,6 +123,12 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
             setShadow(shadowRadius, shadowDx, shadowDy, shadowColor)
         }
         a.recycle()
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val h = makeMeasureSpec(maxHeight, heightMeasureSpec)
+        val w = makeMeasureSpec(maxWidth, widthMeasureSpec)
+        super.onMeasure(w, h)
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
@@ -411,6 +421,26 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
                     LayoutParams.WRAP_CONTENT
                 )
             }
+        }
+
+        @JvmStatic
+        private fun makeMeasureSpec(maxSize: Int, measureSpec: Int): Int {
+            var s = measureSpec
+            if (maxSize > 0) {
+                val size = MeasureSpec.getSize(s)
+                when (MeasureSpec.getMode(s)) {
+                    MeasureSpec.AT_MOST -> {
+                        s = MeasureSpec.makeMeasureSpec(min(size, maxSize), MeasureSpec.AT_MOST)
+                    }
+                    MeasureSpec.UNSPECIFIED -> {
+                        s = MeasureSpec.makeMeasureSpec(maxSize, MeasureSpec.AT_MOST)
+                    }
+                    MeasureSpec.EXACTLY -> {
+                        s = MeasureSpec.makeMeasureSpec(min(size, maxSize), MeasureSpec.EXACTLY)
+                    }
+                }
+            }
+            return s
         }
     }
 
