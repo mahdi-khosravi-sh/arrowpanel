@@ -1,29 +1,29 @@
-package com.mahdikh.vision.arrowpanel.widget;
+package com.mahdikh.vision.arrowpanel.widget
 
-import android.view.View;
+import android.view.View
 
-public interface PanelInterface {
-    void dismiss();
+interface PanelInterface {
+    fun dismiss()
 
-    void cancel();
+    fun cancel()
 
-    interface OnShowListener {
-        void onShow(PanelInterface panelInterface);
+    fun interface OnShowListener {
+        fun onShow(panelInterface: PanelInterface)
     }
 
-    interface OnDismissListener {
-        void onDismiss(PanelInterface panelInterface);
+    fun interface OnDismissListener {
+        fun onDismiss(panelInterface: PanelInterface)
     }
 
-    interface OnCancelListener {
-        void onCancel(PanelInterface panelInterface);
+    fun interface OnCancelListener {
+        fun onCancel(panelInterface: PanelInterface)
     }
 
-    interface OnChildClickListener {
-        void onClick(View view, PanelInterface panelInterface);
+    fun interface OnChildClickListener {
+        fun onClick(view: View, panelInterface: PanelInterface)
     }
 
-    interface OnChildLongClickListener {
-        boolean onLongClick(View view, PanelInterface panelInterface);
+    fun interface OnChildLongClickListener {
+        fun onLongClick(view: View, panelInterface: PanelInterface): Boolean
     }
 }
