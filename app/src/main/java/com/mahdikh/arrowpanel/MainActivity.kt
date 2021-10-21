@@ -61,10 +61,7 @@ class MainActivity : AppCompatActivity() {
             frgPanel = FragmentArrowPanel(this).apply {
                 setContentView(frg)
                 setDim(Color.BLACK, 0.3F)
-                setAnimator(ScaleAnimator().apply {
-                    duration = 250
-                    interpolator = OvershootInterpolator()
-                })
+                setAnimator(ScaleAnimator())
                 setFillColor(Color.WHITE)
                 setTouchAnimator(RotationXYTouchAnimator())
                 setPivotToArrow(true)
@@ -93,9 +90,7 @@ class MainActivity : AppCompatActivity() {
             .setType(ArrowPanel.TYPE_DECOR)
             .setLocation(motionEvent)
             .clearShadow()
-            .setAnimator(SlideAnimator(Gravity.BOTTOM).apply {
-                interpolator = OvershootInterpolator()
-            })
+            .setAnimator(SlideAnimator(Gravity.BOTTOM))
             .setInteractionWhenTouchOutside(false)
             .setCancelableOnTouchOutside(true)
             .setCancelable(true)
