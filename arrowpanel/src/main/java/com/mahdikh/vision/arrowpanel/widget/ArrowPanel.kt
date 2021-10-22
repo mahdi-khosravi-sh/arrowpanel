@@ -357,6 +357,20 @@ open class ArrowPanel(context: Context) : Panel(context) {
         }
     }
 
+    override fun runOnDismissed(runnable: Runnable) {
+        arrowLayout.runOnHidden(runnable)
+    }
+
+    override fun dismiss(endAction: Runnable) {
+        arrowLayout.endHideAction = endAction
+        dismiss()
+    }
+
+    override fun cancel(endAction: Runnable) {
+        arrowLayout.endHideAction = endAction
+        cancel()
+    }
+
     override fun setLayoutDirection(layoutDirection: Int) {
         arrowLayout.layoutDirection = layoutDirection
     }

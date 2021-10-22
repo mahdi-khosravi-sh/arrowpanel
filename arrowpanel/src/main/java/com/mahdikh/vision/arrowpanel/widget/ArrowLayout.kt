@@ -57,6 +57,8 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
             invalidate()
         }
 
+    var endHideAction: Runnable? = null
+
     init {
         setPadding(arrowHeight)
 
@@ -156,7 +158,16 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
     @CallSuper
     open fun hide() {
         syncArrowPath = false
-        animator?.animateHide(this)
+        animator?.let {
+            it.endHideAction = endHideAction
+            it.animateHide(this)
+        } ?: kotlin.run {
+            endHideAction?.run()
+        }
+    }
+
+    fun runOnHidden(runnable: Runnable) {
+        this.endHideAction = runnable
     }
 
     private fun adjustPath() {

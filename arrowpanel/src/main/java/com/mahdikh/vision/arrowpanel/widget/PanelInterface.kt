@@ -5,7 +5,13 @@ import android.view.View
 interface PanelInterface {
     fun dismiss()
 
+    fun dismiss(endAction: Runnable)
+
     fun cancel()
+
+    fun cancel(endAction: Runnable)
+
+    fun runOnDismissed(runnable: Runnable)
 
     fun interface OnShowListener {
         fun onShow(panelInterface: PanelInterface)
