@@ -166,7 +166,7 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
         }
     }
 
-    fun runOnHidden(runnable: Runnable) {
+    fun runOnHidden(runnable: Runnable?) {
         this.endHideAction = runnable
     }
 

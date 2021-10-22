@@ -11,7 +11,7 @@ interface PanelInterface {
 
     fun cancel(endAction: Runnable)
 
-    fun runOnDismissed(runnable: Runnable)
+    fun runOnDismissed(runnable: Runnable?)
 
     fun interface OnShowListener {
         fun onShow(panelInterface: PanelInterface)

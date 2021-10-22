@@ -357,7 +357,7 @@ open class ArrowPanel(context: Context) : Panel(context) {
         }
     }
 
-    override fun runOnDismissed(runnable: Runnable) {
+    override fun runOnDismissed(runnable: Runnable?) {
         arrowLayout.runOnHidden(runnable)
     }
 
@@ -689,6 +689,11 @@ open class ArrowPanel(context: Context) : Panel(context) {
 
         fun setMaxWidthPercent(maxWidthPercent: Int): Builder {
             arrowPanel.maxWidthPercent = maxWidthPercent
+            return this
+        }
+
+        fun runOnDismissed(runnable: Runnable?): Builder {
+            arrowPanel.runOnDismissed(runnable)
             return this
         }
 
