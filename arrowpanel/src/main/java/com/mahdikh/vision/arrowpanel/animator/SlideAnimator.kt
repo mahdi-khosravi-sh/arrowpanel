@@ -42,7 +42,7 @@ open class SlideAnimator : FadeAnimator {
                 v.translationX = x - slideTranslation
             }
         }
-        fadeIn(v)
+        fadeIn(v, (duration / 1.8F).toLong())
         v.animate().apply {
             translationX(x)
                 .translationY(y)
