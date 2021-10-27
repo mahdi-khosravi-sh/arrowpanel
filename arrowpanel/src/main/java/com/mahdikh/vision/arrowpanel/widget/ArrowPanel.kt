@@ -11,9 +11,9 @@ import android.view.*
 import android.view.View.OnClickListener
 import android.view.View.OnLongClickListener
 import android.view.WindowManager.LayoutParams
+import androidx.annotation.CallSuper
 import androidx.annotation.ColorInt
 import androidx.annotation.LayoutRes
-import androidx.annotation.LongDef
 import androidx.fragment.app.FragmentActivity
 import com.mahdikh.vision.arrowpanel.animator.BaseAnimator
 import com.mahdikh.vision.arrowpanel.internal.clear
@@ -36,18 +36,8 @@ open class ArrowPanel(context: Context) : Panel(context) {
     var maxHeightPercent = 0
     var maxWidthPercent = 0
 
-    @DurationDef
-    open var timeOutDuration: Long = DURATION_INFINITE
-        set(value) {
-            if (value == DURATION_INFINITE && field != DURATION_INFINITE) {
-                removeCallbacks(dismissRunnable)
-            }
-            field = value
-        }
-
     private var childClickListener: OnClickListener? = null
     private var childLongClickListener: OnLongClickListener? = null
-    private val dismissRunnable = Runnable { dismiss() }
 
     init {
         alpha = 0.0F
@@ -90,6 +80,7 @@ open class ArrowPanel(context: Context) : Panel(context) {
         }
     }
 
+    @CallSuper
     override fun onShow() {
         post {
             arrowLayout.requestLayout()
@@ -131,9 +122,6 @@ open class ArrowPanel(context: Context) : Panel(context) {
             if (sourceView != null) {
                 it.blur(sourceView, blurQuality, blurRadius, false)
             }
-        }
-        if (timeOutDuration != DURATION_INFINITE) {
-            postDelayed(dismissRunnable, timeOutDuration)
         }
     }
 
@@ -373,13 +361,6 @@ open class ArrowPanel(context: Context) : Panel(context) {
 
     override fun setLayoutDirection(layoutDirection: Int) {
         arrowLayout.layoutDirection = layoutDirection
-    }
-
-    open fun resetTimeout() {
-        removeCallbacks(dismissRunnable)
-        if (timeOutDuration != DURATION_INFINITE) {
-            postDelayed(dismissRunnable, timeOutDuration)
-        }
     }
 
     open fun setAnimator(animator: BaseAnimator?) {
@@ -667,11 +648,6 @@ open class ArrowPanel(context: Context) : Panel(context) {
             return this
         }
 
-        fun setTimeOutDuration(duration: Long): Builder {
-            arrowPanel.timeOutDuration = duration
-            return this
-        }
-
         fun setReusable(reusable: Boolean): Builder {
             arrowPanel.reusable = reusable
             return this
@@ -757,19 +733,8 @@ open class ArrowPanel(context: Context) : Panel(context) {
     companion object {
         const val TYPE_DECOR = 0
         const val TYPE_WINDOW = 1
-
-        const val DURATION_INFINITE: Long = -1
-        const val DURATION_SHORT: Long = 4000
-        const val DURATION_MEDIUM: Long = 5500
-        const val DURATION_LONG: Long = 7000
-
         const val ORIENTATION_HORIZONTAL = 1
         const val ORIENTATION_VERTICAL = 2
-
-        @kotlin.annotation.Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
-        @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
-        @LongDef(DURATION_INFINITE, DURATION_SHORT, DURATION_MEDIUM, DURATION_LONG)
-        annotation class DurationDef
 
         @JvmStatic
         private fun getScreenSize(context: Context): Point {

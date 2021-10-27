@@ -4,12 +4,23 @@ import android.content.Context
 import android.graphics.Color
 import android.view.View
 import android.widget.TextView
+import androidx.annotation.LongDef
 import com.mahdikh.vision.arrowpanel.R
 import com.mahdikh.vision.arrowpanel.animator.ScaleAnimator
 import com.mahdikh.vision.arrowpanel.touchanimator.ScaleTouchAnimator
 
 class ArrowTip private constructor(context: Context) : ArrowPanel(context) {
     private val textView: TextView
+    private val dismissRunnable = Runnable { dismiss() }
+
+    @DurationDef
+    var timeOutDuration: Long = DURATION_INFINITE
+        set(value) {
+            if (value == DURATION_INFINITE && field != DURATION_INFINITE) {
+                removeCallbacks(dismissRunnable)
+            }
+            field = value
+        }
 
     init {
         setDim(Color.BLACK, 0.0f)
@@ -37,7 +48,26 @@ class ArrowTip private constructor(context: Context) : ArrowPanel(context) {
         return textView.text.toString()
     }
 
+    fun resetTimeout() {
+        removeCallbacks(dismissRunnable)
+        if (timeOutDuration != DURATION_INFINITE) {
+            postDelayed(dismissRunnable, timeOutDuration)
+        }
+    }
+
+    override fun onShow() {
+        super.onShow()
+        if (timeOutDuration != DURATION_INFINITE) {
+            postDelayed(dismissRunnable, timeOutDuration)
+        }
+    }
+
     companion object {
+        const val DURATION_INFINITE: Long = -1
+        const val DURATION_SHORT: Long = 4000
+        const val DURATION_MEDIUM: Long = 5500
+        const val DURATION_LONG: Long = 7000
+
         @JvmStatic
         fun make(context: Context, text: String, targetView: View): ArrowTip {
             return make(context, text, targetView, DURATION_INFINITE)
@@ -52,7 +82,7 @@ class ArrowTip private constructor(context: Context) : ArrowPanel(context) {
         fun make(
             context: Context,
             text: String,
-            @ArrowPanel.Companion.DurationDef duration: Long
+            @DurationDef duration: Long
         ): ArrowTip {
             return make(context, text, null, duration)
         }
@@ -62,7 +92,7 @@ class ArrowTip private constructor(context: Context) : ArrowPanel(context) {
             context: Context,
             text: String,
             targetView: View?,
-            @ArrowPanel.Companion.DurationDef duration: Long
+            @DurationDef duration: Long
         ): ArrowTip {
             val tip = ArrowTip(context)
             tip.targetView = targetView
@@ -70,5 +100,10 @@ class ArrowTip private constructor(context: Context) : ArrowPanel(context) {
             tip.setText(text)
             return tip
         }
+
+        @kotlin.annotation.Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
+        @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
+        @LongDef(DURATION_INFINITE, DURATION_SHORT, DURATION_MEDIUM, DURATION_LONG)
+        annotation class DurationDef
     }
 }
