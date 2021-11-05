@@ -320,8 +320,8 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
                     }
                 }
                 else -> {
-                    pointY = (measuredHeight - arrowHeight).toFloat() - halfStroke
-                    centerPointY = measuredHeight.toFloat()
+                    pointY = (height - arrowHeight).toFloat() - halfStroke
+                    centerPointY = height.toFloat()
                     if (edgePointX != -1.0F && edgePointY != -1.0F) {
                         arrowPath.moveTo(edgePointX, height - edgePointY)
                         if (!arrowInLeftSide && cornerRadius > arrowWidth) {

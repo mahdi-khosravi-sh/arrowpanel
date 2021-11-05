@@ -33,6 +33,8 @@ open class ArrowPanel(context: Context) : Panel(context) {
     open var orientation = ORIENTATION_HORIZONTAL or ORIENTATION_VERTICAL
     open var reusable = false
 
+    var gravity: Int = GRAVITY_AUTO
+
     var maxHeightPercent = 0
     var maxWidthPercent = 0
 
@@ -153,6 +155,12 @@ open class ArrowPanel(context: Context) : Panel(context) {
             arrowLayoutWidth = pWidth
         }
 
+        var arrowLayoutGravity = gravity
+
+        var y = 0.0F
+        var x = 0.0F
+        var centerY = false
+
         targetView?.let { target ->
             if (type == TYPE_WINDOW) {
                 target.getLocationOnScreen(targetLocation)
@@ -160,10 +168,6 @@ open class ArrowPanel(context: Context) : Panel(context) {
                 target.getLocationInWindow(targetLocation)
             }
             arrowLayout.targetView = target
-
-            var y: Float
-            var x: Float
-            var centerY = false
 
             when (orientation) {
                 ORIENTATION_HORIZONTAL -> {
@@ -174,8 +178,16 @@ open class ArrowPanel(context: Context) : Panel(context) {
                     when {
                         arrowLayoutHeight < targetLocation[1] || arrowLayoutHeight < pHeight - targetLocation[1] -> {
                             y = if (targetLocation[1] <= pHeight / 3) {
+                                //Arrow Panel Bottom of TargetView
+                                if (gravity == GRAVITY_AUTO) {
+                                    arrowLayoutGravity = Gravity.LEFT or Gravity.TOP
+                                }
                                 (targetLocation[1] + target.height + arrowMargin).toFloat()
                             } else {
+                                //Arrow Panel Top of TargetView
+                                if (gravity == GRAVITY_AUTO) {
+                                    arrowLayoutGravity = Gravity.LEFT or Gravity.BOTTOM
+                                }
                                 (targetLocation[1] - arrowLayoutHeight - arrowMargin).toFloat()
                             }
                         }
@@ -225,13 +237,7 @@ open class ArrowPanel(context: Context) : Panel(context) {
             if (x < 0) {
                 x = 0.0F + arrowMargin
             }
-            arrowLayout.y = y
-            arrowLayout.x = x
         } ?: kotlin.run {
-            var y: Float
-            var x: Float
-            var centerY = false
-
             when (orientation) {
                 ORIENTATION_HORIZONTAL -> {
                     y = targetLocation[1] - (arrowLayoutHeight / 2F)
@@ -241,11 +247,17 @@ open class ArrowPanel(context: Context) : Panel(context) {
                     when {
                         arrowLayoutHeight < targetLocation[1] || arrowLayoutHeight < pHeight - targetLocation[1] -> {
                             y = if (targetLocation[1] <= pHeight / 3) {
+                                if (gravity == GRAVITY_AUTO) {
+                                    arrowLayoutGravity = Gravity.LEFT or Gravity.TOP
+                                }
                                 (targetLocation[1] + arrowMargin).toFloat()
                             } else {
                                 if (arrowLayoutHeight > targetLocation[1]) {
                                     targetLocation[1].toFloat()
                                 } else {
+                                    if (gravity == GRAVITY_AUTO) {
+                                        arrowLayoutGravity = Gravity.LEFT or Gravity.BOTTOM
+                                    }
                                     (targetLocation[1] - arrowLayoutHeight - arrowMargin).toFloat()
                                 }
                             }
@@ -296,9 +308,18 @@ open class ArrowPanel(context: Context) : Panel(context) {
             if (x < 0) {
                 x = 0.0F + arrowMargin
             }
-            arrowLayout.y = y
-            arrowLayout.x = x
         }
+
+        if (gravity != GRAVITY_AUTO) {
+            arrowLayoutGravity = gravity
+        }
+        (arrowLayout.layoutParams as LayoutParams).gravity = arrowLayoutGravity
+        if (arrowLayoutGravity == Gravity.LEFT or Gravity.BOTTOM) {
+            arrowLayout.y = -(height - (y + arrowLayoutHeight))
+        } else {
+            arrowLayout.y = y
+        }
+        arrowLayout.x = x
         arrowLayout.setTargetLocation(targetLocation[0], targetLocation[1])
     }
 
@@ -731,6 +752,8 @@ open class ArrowPanel(context: Context) : Panel(context) {
     }
 
     companion object {
+        const val GRAVITY_AUTO = -1
+
         const val TYPE_DECOR = 0
         const val TYPE_WINDOW = 1
         const val ORIENTATION_HORIZONTAL = 1
