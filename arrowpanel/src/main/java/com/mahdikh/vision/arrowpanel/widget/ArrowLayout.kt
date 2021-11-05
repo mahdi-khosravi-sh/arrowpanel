@@ -186,7 +186,7 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
         if (drawArrow) {
             if (syncArrowPath) {
                 targetView?.let { target ->
-                    if (y + measuredHeight <= targetLocation[1]) {
+                    if (y + height <= targetLocation[1]) {
                         adjustArrowPath(Gravity.BOTTOM)
                     } else if (y >= targetLocation[1]) {
                         adjustArrowPath(Gravity.TOP)
@@ -198,7 +198,7 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
                         }
                     }
                 } ?: kotlin.run {
-                    if (firstYAxis + measuredHeight <= targetLocation[1]) {
+                    if (firstYAxis + height <= targetLocation[1]) {
                         adjustArrowPath(Gravity.BOTTOM)
                     } else if (firstYAxis >= targetLocation[1]) {
                         adjustArrowPath(Gravity.TOP)
@@ -241,8 +241,8 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
                 centerPointX < 0 -> {
                     centerPointX = 0.0F
                 }
-                centerPointX > measuredWidth -> {
-                    centerPointX = measuredWidth.toFloat()
+                centerPointX > width -> {
+                    centerPointX = width.toFloat()
                 }
             }
 
@@ -259,7 +259,7 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
                     leftPointX = arrowHeight.toFloat()
 
                     edgePointX = arrowHeight.toFloat() + halfStroke
-                    edgePointY = measuredHeight - arrowHeight - cornerRadius
+                    edgePointY = height - arrowHeight - cornerRadius
                     rightPointX -= cornerRadius
                     centerPointX -= cornerRadius
                     if (centerPointX > arrowHeight) {
@@ -269,21 +269,21 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
                     }
                     //Left
                 }
-                rightPointX > measuredWidth - arrowHeight - cornerRadius -> {
+                rightPointX > width - arrowHeight - cornerRadius -> {
                     arrowInLeftSide = false
-                    rightPointX = measuredWidth - cornerRadius - arrowHeight
+                    rightPointX = width - cornerRadius - arrowHeight
                     leftPointX = rightPointX - arrowWidth
                     //Rights
 
-                    edgePointX = measuredWidth - arrowHeight.toFloat() - halfStroke
-                    edgePointY = measuredHeight - arrowHeight - cornerRadius
+                    edgePointX = width - arrowHeight.toFloat() - halfStroke
+                    edgePointY = height - arrowHeight - cornerRadius
                     rightPointX += cornerRadius
                     leftPointX += cornerRadius
                     centerPointX += cornerRadius
                     if (centerPointX < edgePointX) {
                         centerPointX = edgePointX
-                    } else if (centerPointX > measuredWidth) {
-                        centerPointX = measuredWidth.toFloat()
+                    } else if (centerPointX > width) {
+                        centerPointX = width.toFloat()
                     }
                 }
             }
@@ -349,8 +349,8 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
             var centerPointY = targetLocation[1] - y + targetHeight / 2F
             if (centerPointY < 0) {
                 centerPointY = 0.0F
-            } else if (centerPointY > measuredHeight) {
-                centerPointY = measuredHeight.toFloat()
+            } else if (centerPointY > height) {
+                centerPointY = height.toFloat()
             }
 
             var topPointY: Float = centerPointY - arrowWidth / 2F
@@ -361,8 +361,8 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
                     topPointY = cornerRadius + arrowHeight
                     bottomPointY = topPointY + arrowWidth
                 }
-                bottomPointY > measuredHeight - cornerRadius - arrowHeight -> {
-                    bottomPointY = measuredHeight - cornerRadius - arrowHeight
+                bottomPointY > height - cornerRadius - arrowHeight -> {
+                    bottomPointY = height - cornerRadius - arrowHeight
                     topPointY = bottomPointY - arrowWidth
                 }
             }
@@ -374,8 +374,8 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
                 pointX = arrowHeight + halfStroke
                 centerPointX = 0.0F
             } else {
-                pointX = measuredWidth - arrowHeight - halfStroke
-                centerPointX = measuredWidth.toFloat()
+                pointX = width - arrowHeight - halfStroke
+                centerPointX = width.toFloat()
             }
 
             arrowPath.moveTo(pointX, topPointY)
