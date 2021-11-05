@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">ArrowPanel</string>
+    <string name="new_window">New Window</string>
+    <string name="all_windows">All Windows</string>
+    <string name="remove_from_favorites">Remove from Favorites</string>
+    <string name="close_all_windows">Close All Windows</string>
+    <string name="show_details">Show Details</string>
+    <string name="minimize_all_windows">Minimize All Windows</string>
+    <string name="restore_minimized_windows">Restore Minimized Windows</string>
 </resources>

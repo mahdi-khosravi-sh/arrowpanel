@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/panel"
+    android:layout_width="260dp"
+    android:layout_height="match_parent"
+    android:maxWidth="260dp">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/itemNewWindow"
+        style="@style/PowerPanelButtonStyle"
+        android:text="@string/new_window"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/itemAllWindows"
+        style="@style/PowerPanelButtonStyle"
+        android:text="@string/all_windows"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/previewRecyclerView"
+        app:layout_constraintTop_toBottomOf="@id/itemNewWindow" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/previewRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:background="#05000000"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toTopOf="@id/itemRemoveFromDock"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/itemAllWindows" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/itemRemoveFromDock"
+        style="@style/PowerPanelButtonStyle"
+        android:text="@string/remove_from_favorites"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/previewRecyclerView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/itemCloseAllWindow"
+        style="@style/PowerPanelButtonStyle"
+        android:text="@string/close_all_windows"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/itemRemoveFromDock" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/itemResotreMinimizedWindows"
+        style="@style/PowerPanelButtonStyle"
+        android:text="@string/restore_minimized_windows"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/itemCloseAllWindow" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/itemMinimizeWindows"
+        style="@style/PowerPanelButtonStyle"
+        android:text="@string/minimize_all_windows"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/itemResotreMinimizedWindows" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#11000000"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/itemMinimizeWindows" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/itemShowDetails"
+        style="@style/PowerPanelButtonStyle"
+        android:text="@string/show_details"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/divider" />
+
+<!--
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="itemCloseAllWindow,divider,itemMinimizeWindows,itemUnMinimizeWindows,itemCloseAllWindow,itemRemoveFromDock,itemNewWindow,itemShowDetails" />
+-->
+</androidx.constraintlayout.widget.ConstraintLayout>

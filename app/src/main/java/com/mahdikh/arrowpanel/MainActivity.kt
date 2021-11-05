@@ -1,6 +1,7 @@
 package com.mahdikh.arrowpanel
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
@@ -9,11 +10,15 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.AutoTransition
+import androidx.transition.TransitionManager
 import com.mahdikh.vision.arrowpanel.animator.ScaleAnimator
 import com.mahdikh.vision.arrowpanel.animator.SlideAnimator
 import com.mahdikh.vision.arrowpanel.touchanimator.RotationXYTouchAnimator
 import com.mahdikh.vision.arrowpanel.widget.ArrowPanel
 import com.mahdikh.vision.arrowpanel.widget.FragmentArrowPanel
+import com.mahdikh.vision.arrowpanel.widget.PanelInterface
 
 class MainActivity : AppCompatActivity() {
     private lateinit var motionEvent: MotionEvent
@@ -50,9 +55,9 @@ class MainActivity : AppCompatActivity() {
     private fun findViews() {
         findViewById<View>(R.id.btn).setOnTouchListener(touchListener)
         findViewById<View>(R.id.btn2).setOnTouchListener(touchListener)
-        findViewById<View>(R.id.root).setOnClickListener { showFaPanel() }
+        findViewById<View>(R.id.root).setOnClickListener { showNewPanel() }
         findViewById<View>(R.id.btn).setOnClickListener { showPanel(it) }
-        findViewById<View>(R.id.btn2).setOnClickListener { showPanelFragment(it) }
+        findViewById<View>(R.id.btn2).setOnClickListener { showNewPanel(it) }
     }
 
     private fun showPanelFragment(v: View) {
@@ -137,5 +142,90 @@ class MainActivity : AppCompatActivity() {
 
     private fun toast(text: CharSequence) {
         Toast.makeText(applicationContext, text, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showNewPanel(view: View) {
+        DockPanel(this).show(view)
+    }
+
+    private fun showNewPanel() {
+        DockPanel(this).show(motionEvent)
+    }
+
+    class DockPanel(context: Context?) :
+        PanelInterface.OnChildClickListener, PanelInterface.OnShowListener {
+        private var menuPanel: ArrowPanel?
+        override fun onClick(view: View, panelInterface: PanelInterface) {
+            val id = view.id
+            if (id == R.id.itemAllWindows) {
+                TransitionManager.beginDelayedTransition(
+                    menuPanel!!.arrowLayout,
+                    AutoTransition().setDuration(200)
+                )
+//                menuPanel!!.arrowLayout.layoutParams.height = menuPanel!!.arrowLayout.height
+                val rv = menuPanel!!.findView(R.id.previewRecyclerView) as RecyclerView
+                val ids = intArrayOf(
+                    R.id.itemCloseAllWindow,
+                    R.id.divider,
+                    R.id.itemMinimizeWindows,
+                    R.id.itemResotreMinimizedWindows,
+                    R.id.itemCloseAllWindow,
+                    R.id.itemRemoveFromDock,
+                    R.id.itemNewWindow,
+                    R.id.itemShowDetails
+                )
+                if (rv.visibility == View.VISIBLE) {
+                    rv.visibility = View.GONE
+//                    setVisibility(View.VISIBLE, *ids)
+                } else {
+                    rv.visibility = View.VISIBLE
+//                    setVisibility(View.GONE, *ids)
+                }
+            }
+        }
+
+        fun setVisibility(visibility: Int, vararg ids: Int) {
+            for (id in ids) {
+                menuPanel!!.findView(id).visibility = visibility
+            }
+        }
+
+        fun show(view: View?) {
+            menuPanel!!.show(view!!)
+        }
+
+        fun show(event: MotionEvent) {
+            menuPanel!!.show(event)
+        }
+
+        override fun onShow(panelInterface: PanelInterface) {
+//            (menuPanel!!.arrowLayout.layoutParams as FrameLayout.LayoutParams).gravity =
+//                Gravity.LEFT or Gravity.BOTTOM
+//            val location = IntArray(2)
+//            menuPanel!!.targetView!!.getLocationOnScreen(location)
+//            menuPanel!!.arrowLayout.y = -(menuPanel!!.height - location[1]).toFloat()
+        }
+
+        init {
+            val IDS = intArrayOf(
+                R.id.itemCloseAllWindow,
+                R.id.itemNewWindow,
+                R.id.itemAllWindows,
+                R.id.itemMinimizeWindows,
+                R.id.itemResotreMinimizedWindows
+            )
+            menuPanel = ArrowPanel.Builder(context!!)
+                .setContentView(R.layout.dock_item_menu_panel)
+                .setOrientation(ArrowPanel.ORIENTATION_VERTICAL)
+                .setAnimator(ScaleAnimator())
+                .setFillColor(Color.parseColor("#EFFFFFFF"))
+                .clearShadow()
+                .setDrawTargetView(false)
+                .setCornerRadius(12f)
+                .setDim(Color.BLACK, 0.4f)
+                .setOnChildClickListener(this, *IDS)
+                .addOnShowListener(this)
+                .build()
+        }
     }
 }
