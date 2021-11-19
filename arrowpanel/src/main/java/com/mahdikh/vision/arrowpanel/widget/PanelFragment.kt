@@ -20,6 +20,18 @@ abstract class PanelFragment : Fragment() {
         panel.cancel()
     }
 
+    open fun dismiss(endAction: Runnable) {
+        panel.dismiss(endAction)
+    }
+
+    open fun cancel(endAction: Runnable) {
+        panel.cancel(endAction)
+    }
+
+    open fun runOnDismissed(runnable: Runnable) {
+        panel.runOnDismissed(runnable)
+    }
+
     open fun setCancelable(cancelable: Boolean) {
         panel.cancelable = cancelable
     }
