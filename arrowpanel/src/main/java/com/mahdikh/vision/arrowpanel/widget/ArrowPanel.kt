@@ -31,6 +31,10 @@ open class ArrowPanel(context: Context) : Panel(context) {
     open var drawTargetView: Boolean = true
     open var type: Int = TYPE_DECOR
     open var orientation = ORIENTATION_HORIZONTAL or ORIENTATION_VERTICAL
+        set(value) {
+            field = value
+            arrowLayout.orientation = field
+        }
     open var reusable = false
 
     var gravity: Int = GRAVITY_AUTO

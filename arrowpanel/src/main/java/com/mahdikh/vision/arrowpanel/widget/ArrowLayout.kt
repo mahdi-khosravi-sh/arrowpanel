@@ -25,12 +25,9 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
     val paint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val arrowPath: Path = Path()
     private val path: Path = Path()
-
     open var animator: BaseAnimator? = null
     open var touchAnimator: TouchAnimator? = null
-
     open var pivotToArrow = true
-
     private val targetLocation: IntArray = IntArray(2)
     private var firstYAxis: Float = 0.0F
     private var firstXAxis: Float = 0.0F
@@ -40,6 +37,7 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
     private var drawStroke = false
     var arrowEdge: Int = Gravity.NO_GRAVITY
         private set
+    internal var orientation = ArrowPanel.ORIENTATION_HORIZONTAL or ArrowPanel.ORIENTATION_VERTICAL
 
     var maxHeight: Int = -1
     var maxWidth: Int = -1
@@ -170,6 +168,22 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
         this.endHideAction = runnable
     }
 
+    private fun adjustArrowPathHorizontal(targetWidth: Int) {
+        if ((x > targetLocation[0] && x < targetLocation[0] + targetWidth) or (x > targetLocation[0] + targetWidth / 2)) {
+            adjustArrowPath(Gravity.LEFT)
+        } else {
+            adjustArrowPath(Gravity.RIGHT)
+        }
+    }
+
+    private fun adjustArrowPathVertical() {
+        if (y + height <= targetLocation[1]) {
+            adjustArrowPath(Gravity.BOTTOM)
+        } else if (y >= targetLocation[1]) {
+            adjustArrowPath(Gravity.TOP)
+        }
+    }
+
     private fun adjustPath() {
         path.reset()
 
@@ -186,15 +200,15 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
         if (drawArrow) {
             if (syncArrowPath) {
                 targetView?.let { target ->
-                    if (y + height <= targetLocation[1]) {
-                        adjustArrowPath(Gravity.BOTTOM)
-                    } else if (y >= targetLocation[1]) {
-                        adjustArrowPath(Gravity.TOP)
+                    if (orientation == ArrowPanel.ORIENTATION_HORIZONTAL) {
+                        adjustArrowPathHorizontal(target.width)
+                    } else if (orientation == ArrowPanel.ORIENTATION_VERTICAL) {
+                        adjustArrowPathVertical()
                     } else {
-                        if ((x > targetLocation[0] && x < targetLocation[0] + target.width) or (x > targetLocation[0] + target.width / 2)) {
-                            adjustArrowPath(Gravity.LEFT)
+                        if (height < target.height) {
+                            adjustArrowPathHorizontal(target.width)
                         } else {
-                            adjustArrowPath(Gravity.RIGHT)
+                            adjustArrowPathVertical()
                         }
                     }
                 } ?: kotlin.run {
