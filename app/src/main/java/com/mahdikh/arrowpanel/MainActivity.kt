@@ -123,6 +123,7 @@ class MainActivity : AppCompatActivity() {
             .setAnimator(SlideAnimator(Gravity.BOTTOM).apply {
                 hideReverse = false
             })
+            .setOrientation(ArrowPanel.ORIENTATION_HORIZONTAL)
             .setTouchAnimator(RotationXYTouchAnimator())
             .setFillColor(Color.parseColor("#EE444444"))
             .clearShadow()
