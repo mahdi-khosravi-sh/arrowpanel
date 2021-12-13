@@ -206,11 +206,7 @@ open class ArrowPanel(context: Context) : Panel(context) {
 
             when {
                 y < 0 -> {
-                    y = if (arrowLayoutHeight < pHeight - (target.y + target.height)) {
-                        target.y + target.height + arrowMargin
-                    } else {
-                        0F + arrowMargin
-                    }
+                    y = arrowMargin.toFloat()
                 }
                 y + arrowLayoutHeight > pHeight -> {
                     y = (pHeight - arrowLayoutHeight - arrowMargin).toFloat()
