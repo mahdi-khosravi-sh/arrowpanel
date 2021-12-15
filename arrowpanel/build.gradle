@@ -6,7 +6,7 @@ plugins {
 
 def LIB_GROUP_ID = 'com.mahdikh.vision'
 def LIB_ARTIFACT_ID = 'arrowpanel'
-def LIB_VERSION = '4.0.6'
+def LIB_VERSION = '4.0.7'
 
 android {
     compileSdk 30
