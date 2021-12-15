@@ -53,8 +53,8 @@ abstract class Panel(context: Context) : FrameLayout(context), PanelInterface {
 
     @CallSuper
     override fun dismiss() {
+        onDismiss()
         if (!mDismissed) {
-            onDismiss()
             dismissListeners?.let { it ->
                 val size = it.size
                 for (i in 0 until size) {
@@ -67,9 +67,9 @@ abstract class Panel(context: Context) : FrameLayout(context), PanelInterface {
 
     @CallSuper
     override fun cancel() {
+        onCancel()
         if (!mCanceled) {
             mCanceled = true
-            onCancel()
             cancelListeners?.let { it ->
                 val size = it.size
                 for (i in 0 until size) {

@@ -97,8 +97,10 @@ open class ArrowPanel(context: Context) : Panel(context) {
     }
 
     override fun onDismiss() {
-        arrowLayout.hide()
-        hide()
+        post {
+            arrowLayout.hide()
+            hide()
+        }
     }
 
     private fun hide() {
@@ -116,8 +118,7 @@ open class ArrowPanel(context: Context) : Panel(context) {
                 } else {
                     getRootViewGroup()?.removeView(this@ArrowPanel)
                 }
-            }
-            .start()
+            }.start()
     }
 
     private fun showArrowLayout() {
