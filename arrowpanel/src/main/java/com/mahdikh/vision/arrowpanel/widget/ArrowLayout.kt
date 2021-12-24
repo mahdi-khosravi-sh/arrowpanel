@@ -10,6 +10,7 @@ import android.graphics.Path
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.CallSuper
 import androidx.annotation.ColorInt
@@ -169,11 +170,43 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
     }
 
     private fun adjustArrowPathHorizontal(targetWidth: Int) {
-        if ((x > targetLocation[0] && x < targetLocation[0] + targetWidth) or (x > targetLocation[0] + targetWidth / 2)) {
+        val p = parent as ViewGroup
+        val pHalfWidth = p.width / 2F
+
+        if (targetLocation[0] + targetWidth / 2F < pHalfWidth) {
             adjustArrowPath(Gravity.LEFT)
         } else {
-            adjustArrowPath(Gravity.RIGHT)
+            val w = width
+            if (firstXAxis + w > targetLocation[0] + targetWidth) {
+                if (firstXAxis < targetLocation[0]) {
+                    adjustArrowPath(Gravity.RIGHT)
+                    return
+                } else {
+                    if (firstXAxis + w > targetLocation[0] + targetWidth) {
+                        adjustArrowPath(Gravity.LEFT)
+                    } else {
+                        adjustArrowPath(Gravity.RIGHT)
+                    }
+                }
+            } else {
+                adjustArrowPath(Gravity.RIGHT)
+            }
         }
+
+
+//        if ((x > targetLocation[0] && x < targetLocation[0] + targetWidth) or (x > targetLocation[0] + targetWidth / 2)) {
+//            if (targetLocation[0] + targetWidth / 2F < pWidth / 2) {
+//                adjustArrowPath(Gravity.LEFT)
+//            } else {
+//                adjustArrowPath(Gravity.RIGHT)
+//            }
+//        } else {
+//            if (targetLocation[0] + targetWidth / 2F < pWidth / 2) {
+//                adjustArrowPath(Gravity.LEFT)
+//            } else {
+//                adjustArrowPath(Gravity.RIGHT)
+//            }
+//        }
     }
 
     private fun adjustArrowPathVertical() {
