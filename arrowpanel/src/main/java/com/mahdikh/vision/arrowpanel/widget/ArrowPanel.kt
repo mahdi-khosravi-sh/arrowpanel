@@ -539,6 +539,10 @@ open class ArrowPanel(context: Context) : Panel(context) {
             return this
         }
 
+        fun <T : View> findView(@IdRes id: Int): T {
+            return arrowPanel.findView(id)
+        }
+
         fun setContentView(@LayoutRes layoutId: Int): Builder {
             panelParams.mViewLayoutResId = layoutId
             panelParams.mView = null
