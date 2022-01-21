@@ -13,6 +13,7 @@ import android.view.View.OnLongClickListener
 import android.view.WindowManager.LayoutParams
 import androidx.annotation.CallSuper
 import androidx.annotation.ColorInt
+import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.FragmentActivity
 import com.mahdikh.vision.arrowpanel.animator.BaseAnimator
@@ -411,7 +412,7 @@ open class ArrowPanel(context: Context) : Panel(context) {
         return arrowLayout
     }
 
-    open fun findView(id: Int): View {
+    open fun <T : View> findView(@IdRes id: Int): T {
         return arrowLayout.findViewById(id)
     }
 
@@ -527,6 +528,10 @@ open class ArrowPanel(context: Context) : Panel(context) {
     class Builder(context: Context) {
         private val panelParams = PanelParams()
         private val arrowPanel = ArrowPanel(context)
+
+        fun attachContentView() {
+            panelParams.attachContentView(arrowPanel)
+        }
 
         fun setContentView(view: View): Builder {
             panelParams.mView = view
