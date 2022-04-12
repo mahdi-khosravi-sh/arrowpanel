@@ -210,7 +210,16 @@ open class ArrowLayout(context: Context) : FrameLayout(context) {
     }
 
     private fun adjustArrowPathVertical() {
-        if (y + height <= targetLocation[1]) {
+        val bottom = y + height
+        val target = targetView
+        if (target != null) {
+            val targetBottom = targetLocation[1] + target.height
+            if (bottom <= targetBottom && bottom >= targetLocation[1]) {
+                adjustArrowPath(Gravity.BOTTOM)
+                return
+            }
+        }
+        if (bottom <= targetLocation[1]) {
             adjustArrowPath(Gravity.BOTTOM)
         } else if (y >= targetLocation[1]) {
             adjustArrowPath(Gravity.TOP)
