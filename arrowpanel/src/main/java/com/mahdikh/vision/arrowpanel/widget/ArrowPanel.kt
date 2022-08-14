@@ -146,16 +146,20 @@ open class ArrowPanel(context: Context) : Panel(context) {
         }
     }
 
+    private fun adjustCenter() {
+        val pw = width
+        val ph = height
+
+        arrowLayout.x = (pw - arrowLayout.width) / 2F
+        arrowLayout.y = (ph - arrowLayout.height) / 2F
+    }
+
     private fun adjustArrowLayoutLocation() {
         adjustMaximumSizes()
         measure(0, 0)
 
         if (showCenter) {
-            val pw = width
-            val ph = height
-
-            arrowLayout.x = (pw - arrowLayout.width)/2F
-            arrowLayout.y = (ph - arrowLayout.height)/2F
+            adjustCenter()
             return
         }
 
@@ -336,6 +340,14 @@ open class ArrowPanel(context: Context) : Panel(context) {
         arrowLayout.setTargetLocation(targetLocation[0], targetLocation[1])
     }
 
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        if (showCenter) {
+            if (w != oldw || h != oldh) {
+                adjustCenter()
+            }
+        }
+    }
     private fun addAsWindow() {
         val context = context
         val manager = getWindowManager(context)
@@ -430,7 +442,7 @@ open class ArrowPanel(context: Context) : Panel(context) {
     }
 
     protected open fun getRootViewGroup(): ViewGroup? {
-        if (this.container!=null) return container
+        if (this.container != null) return container
         if (context is FragmentActivity) {
             return (context as FragmentActivity).window.decorView.rootView as ViewGroup
         }
