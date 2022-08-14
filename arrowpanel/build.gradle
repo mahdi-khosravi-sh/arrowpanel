@@ -11,6 +11,12 @@ def LIB_VERSION = '4.2.0'
 android {
     compileSdk 30
 
+    publishing {
+        singleVariant('release') {
+            withSourcesJar()
+        }
+    }
+
     defaultConfig {
         minSdk 21
         targetSdk 30
