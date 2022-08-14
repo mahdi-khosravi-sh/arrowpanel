@@ -6,19 +6,20 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.mahdikh.vision.arrowpanel.animator.ScaleAnimator
 import com.mahdikh.vision.arrowpanel.animator.SlideAnimator
+import com.mahdikh.vision.arrowpanel.animator.UnMagnifyAnimator
 import com.mahdikh.vision.arrowpanel.touchanimator.RotationXYTouchAnimator
 import com.mahdikh.vision.arrowpanel.widget.ArrowPanel
 import com.mahdikh.vision.arrowpanel.widget.FragmentArrowPanel
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var viewGroup: ViewGroup
     private lateinit var motionEvent: MotionEvent
     private var frg: ImageFragment = ImageFragment()
-    private var frgPanel: FragmentArrowPanel? = null
     private val touchListener = object : View.OnTouchListener {
         var x: Float = 0.0F
         var y: Float = 0.0F
@@ -48,6 +49,7 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun findViews() {
+        viewGroup = findViewById(R.id.viewGroup)
         findViewById<View>(R.id.btn).setOnTouchListener(touchListener)
         findViewById<View>(R.id.btn2).setOnTouchListener(touchListener)
         findViewById<View>(R.id.root).setOnClickListener { showFaPanel() }
@@ -56,20 +58,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showPanelFragment(v: View) {
-        if (frgPanel == null) {
-            frgPanel = FragmentArrowPanel(this).apply {
-                setContentView(frg)
-                setDim(Color.BLACK, 0.3F)
-                setAnimator(ScaleAnimator())
-                setFillColor(Color.WHITE)
-                setTouchAnimator(RotationXYTouchAnimator())
-                setPivotToArrow(true)
-                showOnResume = true
-                reusable = true
-                show(v)
-            }
-        } else {
-            frgPanel?.show(v)
+        FragmentArrowPanel(this).apply {
+            setContentView(frg)
+            setDim(Color.BLACK, 0.3F)
+            setAnimator(UnMagnifyAnimator())
+            setFillColor(Color.WHITE)
+            setTouchAnimator(RotationXYTouchAnimator())
+            setPivotToArrow(false)
+            setContainer(viewGroup)
+            setShowCenter(true)
+            setDrawArrow(false)
+            showOnResume = true
+            reusable = false
+            show()
         }
     }
 
