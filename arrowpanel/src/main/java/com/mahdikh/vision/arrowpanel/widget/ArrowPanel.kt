@@ -151,6 +151,11 @@ open class ArrowPanel(context: Context) : Panel(context) {
         measure(0, 0)
 
         if (showCenter) {
+            val pw = width
+            val ph = height
+
+            arrowLayout.x = (pw - arrowLayout.width)/2F
+            arrowLayout.y = (ph - arrowLayout.height)/2F
             return
         }
 
@@ -425,6 +430,7 @@ open class ArrowPanel(context: Context) : Panel(context) {
     }
 
     protected open fun getRootViewGroup(): ViewGroup? {
+        if (this.container!=null) return container
         if (context is FragmentActivity) {
             return (context as FragmentActivity).window.decorView.rootView as ViewGroup
         }
