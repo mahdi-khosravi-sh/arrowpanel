@@ -25,6 +25,8 @@ open class ArrowPanel(context: Context) : Panel(context) {
     private val targetLocation: IntArray = IntArray(2)
     private var blurView: BlurView? = null
     open var targetView: View? = null
+    private var container: ViewGroup? = null
+    private var showCenter = false
     open var drawBlurEffect = false
     open var blurQuality: Int = 10
     open var blurRadius: Float = 5.0F
@@ -147,6 +149,10 @@ open class ArrowPanel(context: Context) : Panel(context) {
     private fun adjustArrowLayoutLocation() {
         adjustMaximumSizes()
         measure(0, 0)
+
+        if (showCenter) {
+            return
+        }
 
         val pWidth = rootView.width
         val pHeight = rootView.height
@@ -342,12 +348,14 @@ open class ArrowPanel(context: Context) : Panel(context) {
     }
 
     private fun addInRootViewGroup() {
-        getRootViewGroup()?.let { rootView ->
+        val viewGroup = container ?: getRootViewGroup()
+        if (viewGroup != null) {
             if (arrowLayout.parent == null) {
                 addView(arrowLayout)
             }
-            rootView.addView(this)
-        } ?: kotlin.run {
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+            viewGroup.addView(this)
+        } else {
             type = TYPE_WINDOW
             addAsWindow()
         }
@@ -497,6 +505,14 @@ open class ArrowPanel(context: Context) : Panel(context) {
         for (i in 0 until size) {
             arrowLayout.findViewById<View>(ids[i]).setOnLongClickListener(childLongClickListener)
         }
+    }
+
+    fun setContainer(viewGroup: ViewGroup) {
+        this.container = viewGroup
+    }
+
+    fun setShowCenter(showCenter: Boolean) {
+        this.showCenter = showCenter
     }
 
     open fun setPivotToArrow(pivotToArrow: Boolean) {
@@ -667,6 +683,14 @@ open class ArrowPanel(context: Context) : Panel(context) {
         fun setCancelable(cancel: Boolean): Builder {
             arrowPanel.cancelable = cancel
             return this
+        }
+
+        fun setContainer(container: ViewGroup) {
+            arrowPanel.container = container
+        }
+
+        fun setShowCenter(showCenter: Boolean) {
+            arrowPanel.showCenter = showCenter
         }
 
         fun setCancelableOnTouchOutside(cancel: Boolean): Builder {
